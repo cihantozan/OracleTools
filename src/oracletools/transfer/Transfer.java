@@ -8,8 +8,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import oracletools.Logger;
-import oracletools.OracleConnection;
+import oracletools.util.Logger;
+import oracletools.util.OracleConnection;
 
 public class Transfer {
 	

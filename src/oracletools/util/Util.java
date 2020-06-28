@@ -1,4 +1,4 @@
-package oracletools;
+package oracletools.util;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

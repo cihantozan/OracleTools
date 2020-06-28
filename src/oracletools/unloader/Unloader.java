@@ -18,8 +18,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import oracletools.OracleConnection;
-import oracletools.Util;
+import oracletools.util.OracleConnection;
+import oracletools.util.Util;
 
 
 

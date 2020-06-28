@@ -7,6 +7,7 @@ import oracletools.filecombiner.FileCombiner;
 import oracletools.loader.Loader;
 import oracletools.transfer.Transfer;
 import oracletools.unloader.Unloader;
+import oracletools.util.OracleConnection;
 
 //connectionlar þifreli biçimde kaydedilecek
 //TNS varsa alýnacak

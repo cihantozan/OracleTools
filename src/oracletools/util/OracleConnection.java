@@ -1,4 +1,4 @@
-package oracletools;
+package oracletools.util;
 
 public class OracleConnection {
 	private String user;

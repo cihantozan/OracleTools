@@ -1,4 +1,4 @@
-package oracletools;
+package oracletools.util;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;

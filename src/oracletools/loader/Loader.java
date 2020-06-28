@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
-import oracletools.OracleConnection;
-import oracletools.Util;
 import oracletools.unloader.UnloaderMessaging;
+import oracletools.util.OracleConnection;
+import oracletools.util.Util;
 
 public class Loader {
 
