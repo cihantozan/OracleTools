@@ -77,7 +77,8 @@ public class Transfer {
 			
 			if(truncateTargetTable) {
 				Statement truncateStmt=targetCon.createStatement();
-				truncateStmt.executeUpdate("truncate table " + targetTable);			
+				truncateStmt.executeUpdate("truncate table " + targetTable);
+				logger.message("Truncated");
 			}
 			
 			

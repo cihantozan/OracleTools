@@ -38,7 +38,7 @@ public class Logger {
 	public void start() {
 		startTime=LocalDateTime.now();
 		prevStepTime=startTime;
-		print("Started :" + durDateTimeFormatter.format(startTime));
+		print("Started : " + durDateTimeFormatter.format(startTime));
 	}
 	public void message(String message) {
 		LocalDateTime t=LocalDateTime.now();
@@ -63,7 +63,7 @@ public class Logger {
 	}
 	public void end() {
 		endTime=LocalDateTime.now();
-		print("Finished :" + durDateTimeFormatter.format(endTime));
+		print("Finished : " + durDateTimeFormatter.format(endTime));
 	}
 	
 	private void print(String str) {

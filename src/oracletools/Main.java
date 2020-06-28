@@ -3,23 +3,18 @@ package oracletools;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import oracletools.filecombiner.FileCombiner;
 import oracletools.loader.Loader;
 import oracletools.transfer.Transfer;
 import oracletools.unloader.Unloader;
+import oracletools.util.FileCombiner;
 import oracletools.util.OracleConnection;
 
 //connectionlar þifreli biçimde kaydedilecek
 //TNS varsa alýnacak
 //parametrelerin default deðerleri???
-//loglara rows per second ekle, avg rps de ekle, formatla
-//trucate için ayrý log
-//loglama utile gitsin
 //classlara run koy
-//directpath gibi deðiþiklikler loadera da yapýlacak
 //paralellik
 //parallel unload mult.files, paralllel unload one file, parallel loaf from mult. files, parallel transfer
-//file combiner loglamasý yapýlacak
 
 public class Main {
 
@@ -58,31 +53,32 @@ public class Main {
 		int batchSize=1000000;
 		boolean truncateTargetTable=true;
 		boolean directPathInsert=false;
-		boolean commitAfterLoad=true;
+		boolean commitAfterLoad=false;
 		
 		Loader loader = new Loader(connection, file, tableName, columnDelimiter, rowDelimiter, skipRowCount, dateTimeFormat, timestampFormat, decimalSeperator, batchSize, truncateTargetTable, directPathInsert, commitAfterLoad);
 		loader.load();
 		*/
 		
 		//TRANSFER
-		
+		/*
 		OracleConnection sourceConnection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
 		OracleConnection targetConnection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
-		String sourceQuery="select * from user1.table1 where rownum<=102";
+		String sourceQuery="select * from user1.table1";
 		String targetTable="user1.table2";
 		int batchSize=500000;	
 		boolean truncateTargetTable=true;
-		boolean directPathInsert=false;
+		boolean directPathInsert=true;
 		boolean commitAfterLoad=false;
 		
 		Transfer transfer=new Transfer(sourceConnection, targetConnection, sourceQuery, targetTable, batchSize, truncateTargetTable, directPathInsert, commitAfterLoad);
 		transfer.transfer();
-		
+		*/
 		
 		/*
 		String[] files = {"C:\\Users\\Cihan\\Documents\\a_1.txt","C:\\Users\\Cihan\\Documents\\a_2.txt","C:\\Users\\Cihan\\Documents\\a_3.txt","C:\\Users\\Cihan\\Documents\\a_4.txt"};
-		String targetFileName="a.txt";		
-		FileCombiner combiner=new FileCombiner(files, targetFileName);
+		String targetFileName="a.txt";
+		String rowDelimiter="\r\n";
+		FileCombiner combiner=new FileCombiner(files, targetFileName, rowDelimiter);
 		combiner.combine();
 		*/
 		

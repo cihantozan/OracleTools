@@ -15,11 +15,8 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
+import oracletools.util.Logger;
 import oracletools.util.OracleConnection;
-import oracletools.util.Util;
 
 
 
@@ -47,8 +44,9 @@ public class Unloader {
 	private SimpleDateFormat simpleDateTimeFormat;
 	private SimpleDateFormat simpleTimeStampFormat;
 	private DecimalFormat decimalFormat;
-	private DecimalFormat decimalFormat_m;
-	private DateTimeFormatter durDateTimeFormatter;
+
+	
+	private Logger logger;
 	
 	
 	public Unloader(OracleConnection connection, String file, String query, String columnDelimiter, String rowDelimiter,boolean addColumnNames, String dateFormat, String dateTimeFormat, char decimalSeperator, int fetchSize, int rowCountMessageLength) {
@@ -77,13 +75,7 @@ public class Unloader {
 		decimalFormat=new DecimalFormat("",symbols);
 		decimalFormat.setGroupingUsed(false);
 		
-		durDateTimeFormatter=DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-		
-		//Decimal format for messages
-		DecimalFormatSymbols symbols_m=new DecimalFormatSymbols();		
-		symbols_m.setGroupingSeparator('.');
-		decimalFormat_m=new DecimalFormat("",symbols_m);
-		decimalFormat_m.setGroupingUsed(true);
+		logger=new Logger();
 	}
 
 
@@ -91,11 +83,8 @@ public class Unloader {
 	public void unload() throws ClassNotFoundException, SQLException, IOException {		
 
 		try {
-			
-			LocalDateTime startTime = LocalDateTime.now();
-			LocalDateTime messageTime;
-			LocalDateTime prevTime=startTime;
-			UnloaderMessaging.setMessage(Util.rpad("Started",34," ")+durDateTimeFormatter.format(startTime));
+						
+			logger.start();
 		
 			stream=new FileOutputStream(file);
 			writer=new OutputStreamWriter(stream,"windows-1254");
@@ -111,11 +100,8 @@ public class Unloader {
 			rs.setFetchSize(fetchSize);
 			ResultSetMetaData resultSetMetaData = rs.getMetaData();									
 			boolean firstRow=rs.next();
-			
-			//query time messaging
-			messageTime = LocalDateTime.now();
-			UnloaderMessaging.setMessage(Util.rpad("Query executed",34," ") + durDateTimeFormatter.format(messageTime) + " " + Util.getDiffTimeString(prevTime, messageTime));
-			prevTime=messageTime;
+						
+			logger.message("Query executed");
 			
 			//columnNames
 			if(addColumnNames && firstRow) {
@@ -132,29 +118,21 @@ public class Unloader {
 				rowCount++;
 				
 				//rowCountMessaging
-				if(rowCount % rowCountMessageLength==0) {
-					messageTime = LocalDateTime.now();
-					UnloaderMessaging.setMessage(Util.rpad( "   " + Util.rpad(decimalFormat_m.format(rowCount),14," ")+ " rows extracted",34," ") + durDateTimeFormatter.format(messageTime) + " " + Util.getDiffTimeString(prevTime, messageTime));
-					prevTime=messageTime;
+				if(rowCount == rowCountMessageLength) {
+					logger.step(rowCount, "rows extracted");
+					rowCount=0;
 				}
 				
 				hasRows=rowInfo.getHasRowsAfter();
 			}
 			
-			//last rowCount message
-			if(rowCount % rowCountMessageLength!=0 || rowCount==0) {
-				messageTime = LocalDateTime.now();
-				UnloaderMessaging.setMessage(Util.rpad("   " + Util.rpad(decimalFormat_m.format(rowCount),14," ")+ " rows extracted",34," ") + durDateTimeFormatter.format(messageTime) + " " + Util.getDiffTimeString(prevTime, messageTime));				
-			}			
-			
-						
+			logger.step(rowCount, "rows extracted");		
+									
 			writer.close();
 			stream.close();
 			con.close();
 			
-			//finish message
-			LocalDateTime endTime = LocalDateTime.now();
-			UnloaderMessaging.setMessage(Util.rpad("Finished",34," ")+durDateTimeFormatter.format(endTime) + " " + Util.getDiffTimeString(startTime,endTime));						
+			logger.end();						
 		
 		}
 		catch(Exception e) {

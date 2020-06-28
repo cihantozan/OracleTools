@@ -9,15 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
-
-import oracletools.unloader.UnloaderMessaging;
+import oracletools.util.Logger;
 import oracletools.util.OracleConnection;
-import oracletools.util.Util;
 
 public class Loader {
 
@@ -36,12 +30,10 @@ public class Loader {
 	private boolean directPathInsert;
 	private boolean commitAfterLoad;
 	
-	private Connection con;
-	private DateTimeFormatter durDateTimeFormatter;
-	private DecimalFormat decimalFormat_m;
+	private Connection con;	
 	private Scanner scanner;
 	
-	
+	private Logger logger;
 	
 	public Loader(OracleConnection connection, String file, String tableName, String columnDelimiter, String rowDelimiter, int skipRowCount, String dateTimeFormat, String timestampFormat, char decimalSeperator, int batchSize, boolean truncateTargetTable, boolean directPathInsert, boolean commitAfterLoad) {
 		super();
@@ -59,24 +51,15 @@ public class Loader {
 		this.directPathInsert=directPathInsert;
 		this.commitAfterLoad=commitAfterLoad;
 		
+		logger=new Logger();
 		
-		durDateTimeFormatter=DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-		
-		//Decimal format for messages
-		DecimalFormatSymbols symbols_m=new DecimalFormatSymbols();		
-		symbols_m.setGroupingSeparator('.');
-		decimalFormat_m=new DecimalFormat("",symbols_m);
-		decimalFormat_m.setGroupingUsed(true);
 	}
 	
 	public void load() throws FileNotFoundException, UnsupportedEncodingException, ClassNotFoundException, SQLException {
 		
 		try {
 		
-			LocalDateTime startTime = LocalDateTime.now();
-			LocalDateTime messageTime;
-			LocalDateTime prevTime=startTime;
-			UnloaderMessaging.setMessage(Util.rpad("Initialization Started",34," ")+durDateTimeFormatter.format(startTime));
+			logger.start();
 		
 			
 			String v_owner;	
@@ -130,6 +113,7 @@ public class Loader {
 			
 			if(truncateTargetTable) {
 				stmt.executeUpdate("truncate table "+tableName);
+				logger.message("Truncated");
 			}
 			
 			//load
@@ -138,14 +122,10 @@ public class Loader {
 			
 			String rowStr;
 			String[] columns;
-			int currentBatchSize=0;
-			long insertedRowCount=0;
+			int currentBatchSize=0;			
 			long readedRowCount=0;
 			
-			messageTime = LocalDateTime.now();
-			//UnloaderMessaging.setMessage(Util.rpad("Insert Started",34," ") + durDateTimeFormatter.format(messageTime) + " " + Util.getDiffTimeString(prevTime, messageTime)+ " " + Util.getDiffTimeString(startTime, messageTime));
-			UnloaderMessaging.setMessage(Util.rpad("Insert Started",34," ") + "| Step : " + Util.getDiffTimeString(prevTime, messageTime) + " | Total : " + Util.getDiffTimeString(startTime, messageTime) + " | Now : " + durDateTimeFormatter.format(messageTime) );
-			prevTime=messageTime;
+			logger.message("Initialized");
 			
 			while(scanner.hasNext()) {
 				rowStr=scanner.next();
@@ -162,13 +142,9 @@ public class Loader {
 						if(!directPathInsert && !commitAfterLoad) {
 							con.commit();
 						}
-						insertedRowCount+=currentBatchSize;					
-						
-						
-						messageTime = LocalDateTime.now();
-						UnloaderMessaging.setMessage(Util.rpad( "   " + Util.rpad(decimalFormat_m.format(insertedRowCount),14," ")+ " rows inserted",34," ")  + "| Step : " + Util.getDiffTimeString(prevTime, messageTime) + " | Total : " + Util.getDiffTimeString(startTime, messageTime) + " | rps : " + Util.getRps(prevTime, messageTime, currentBatchSize) + " | Now : " + durDateTimeFormatter.format(messageTime) );
-						prevTime=messageTime;
-						
+											
+						logger.step(currentBatchSize, "rows inserted");
+												
 						currentBatchSize=0;
 					}
 				}
@@ -178,11 +154,7 @@ public class Loader {
 				if(!directPathInsert && !commitAfterLoad) {
 					con.commit();
 				}
-				insertedRowCount+=currentBatchSize;
-				
-				messageTime = LocalDateTime.now();
-				UnloaderMessaging.setMessage(Util.rpad( "   " + Util.rpad(decimalFormat_m.format(insertedRowCount),14," ")+ " rows inserted",34," ")  + "| Step : " + Util.getDiffTimeString(prevTime, messageTime) + " | Total : " + Util.getDiffTimeString(startTime, messageTime) + " | Now : " + durDateTimeFormatter.format(messageTime) );
-				prevTime=messageTime;
+				logger.step(currentBatchSize, "rows inserted");
 			}
 			
 			if(commitAfterLoad) {
@@ -192,9 +164,7 @@ public class Loader {
 			scanner.close();
 			
 			
-			//finish message		
-			messageTime = LocalDateTime.now();
-			UnloaderMessaging.setMessage(Util.rpad("Finished",34," ") + "| Step : " + Util.getDiffTimeString(prevTime, messageTime) + " | Total : " + Util.getDiffTimeString(startTime, messageTime) + " | Now : " + durDateTimeFormatter.format(messageTime) );
+			logger.end();
 			
 		}
 		catch(Exception e) {
