@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import oracletools.loader.Loader;
 import oracletools.transfer.Transfer;
-import oracletools.unloader.Unloader;
+import oracletools.unloader.SerialUnloader;
 import oracletools.util.FileCombiner;
 import oracletools.util.OracleConnection;
 

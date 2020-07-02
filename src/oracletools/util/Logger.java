@@ -6,6 +6,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import oracletools.util.listeners.LoggerActivityListener;
+
 public class Logger {
 	
 	private LocalDateTime startTime;
@@ -19,7 +21,32 @@ public class Logger {
 	
 	private long totalRowCount;
 	
-	public Logger() {
+	private LoggerActivityListener loggerActivityListener;	
+	public LoggerActivityListener getLoggerActivityListener() {
+		return loggerActivityListener;
+	}
+	public void setLoggerActivityListener(LoggerActivityListener loggerActivityListener) {
+		this.loggerActivityListener = loggerActivityListener;
+	}
+	
+	private String lastMessage;
+	public String getLastMessage() {
+		return lastMessage;
+	}
+	
+	private String threadName;
+
+	public String getThreadName() {
+		return threadName;
+	}
+	public void setThreadName(String threadName) {
+		this.threadName = threadName;
+	}
+	
+	public Logger(String threadName) {
+		
+		this.threadName=threadName;
+		
 		durDateTimeFormatter=DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 		
 		//Decimal format for messages
@@ -38,11 +65,14 @@ public class Logger {
 	public void start() {
 		startTime=LocalDateTime.now();
 		prevStepTime=startTime;
-		print("Started : " + durDateTimeFormatter.format(startTime));
+		lastMessage="Started : " + durDateTimeFormatter.format(startTime);
+		
+		loggerActivityListener.onLogActivity(threadName,this);
 	}
 	public void message(String message) {
 		LocalDateTime t=LocalDateTime.now();
-		print(message + " : " + durDateTimeFormatter.format(t));
+		lastMessage=message + " : " + durDateTimeFormatter.format(t);
+		loggerActivityListener.onLogActivity(threadName,this);
 	}
 	public void step(long rowCount, String message) {
 		stepTime=LocalDateTime.now();
@@ -55,20 +85,26 @@ public class Logger {
 		
 		String totalRowCountString=Util.rpad(decimalFormatWithoutPrecision.format(totalRowCount),14," ");
 		
-		String printMessage = "  " + totalRowCountString + message + " | Step Time:" + stepDiffStr + " | Total Time:" + totalDiffStr + " | Rps:" + rps + " | Total Rps:" + totalRps; 
-		
-		print(printMessage);
-		
+		lastMessage = "  " + totalRowCountString + message + " | Step Time:" + stepDiffStr + " | Total Time:" + totalDiffStr + " | Rps:" + rps + " | Total Rps:" + totalRps; 
+						
 		prevStepTime=stepTime;
+		
+		loggerActivityListener.onLogActivity(threadName,this);
 	}
 	public void end() {
 		endTime=LocalDateTime.now();
-		print("Finished : " + durDateTimeFormatter.format(endTime));
+		lastMessage="Finished : " + durDateTimeFormatter.format(endTime);
+		
+		loggerActivityListener.onLogActivity(threadName,this);
+	}
+	public void error() {
+		endTime=LocalDateTime.now();
+		lastMessage="Error : " + durDateTimeFormatter.format(endTime);
+		
+		loggerActivityListener.onLogActivity(threadName,this);
 	}
 	
-	private void print(String str) {
-		System.out.println(str);
-	}
+	
 	private String getDiffTimeString(LocalDateTime startTime,LocalDateTime endTime) {
 		Duration diff=Duration.between(startTime, endTime);	
 		return Util.lpad(diff.toHoursPart(),2,"0") +":"+Util.lpad(diff.toMinutesPart(),2,"0")+":"+Util.lpad(diff.toSecondsPart(),2,"0");
