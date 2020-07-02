@@ -14,27 +14,40 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+
+import oracletools.util.IOracleTool;
+import oracletools.util.IParameters;
 import oracletools.util.Logger;
-import oracletools.util.OracleConnection;
 import oracletools.util.listeners.ErrorListener;
 import oracletools.util.listeners.LoggerActivityListener;
 
 
 
 
-public class SerialUnloader implements Runnable {
+public class SerialUnloader implements IOracleTool {
+		
+	private String name;
+	@Override
+	public String getName() {
+		return this.name;
+	}
+	@Override
+	public void SetName(String name) {
+		this.name=name;		
+	}
+
 	
-	private OracleConnection connection;
-	private String file;
-	private String query; 
-	private String columnDelimiter; 
-	private String rowDelimiter;
-	private boolean addColumnNames; 
-	private String dateFormat;
-	private String dateTimeFormat; 
-	private char decimalSeperator; 
-	private int fetchSize;
-	private int rowCountMessageLength;
+	private UnloaderParameters parameters;
+		
+	@Override
+	public IParameters getParameters() {		
+		return this.parameters;
+	}
+	@Override
+	public void setParameters(IParameters parameters) {
+		this.parameters=(UnloaderParameters) parameters;
+	}
+	
 	
 	private Connection con;
 	private FileOutputStream stream;
@@ -45,7 +58,8 @@ public class SerialUnloader implements Runnable {
 	private SimpleDateFormat simpleDateTimeFormat;
 	private SimpleDateFormat simpleTimeStampFormat;
 	private DecimalFormat decimalFormat;
-
+	
+	
 	
 	private Logger logger;
 		
@@ -57,8 +71,7 @@ public class SerialUnloader implements Runnable {
 		this.errorListener = errorListener;
 	}
 
-	
-	
+		
 	public LoggerActivityListener getLoggerActivityListener() {
 		return logger.getLoggerActivityListener();
 	}
@@ -66,44 +79,30 @@ public class SerialUnloader implements Runnable {
 		logger.setLoggerActivityListener(loggerActivityListener);
 	}
 	
-	private String threadName;
-	
-	public String getThreadName() {
-		return threadName;
-	}
-	public void setThreadName(String threadName) {
-		this.threadName = threadName;
-	}
 	
 	
-	public SerialUnloader(String threadName, OracleConnection connection, String file, String query, String columnDelimiter, String rowDelimiter,boolean addColumnNames, String dateFormat, String dateTimeFormat, char decimalSeperator, int fetchSize, int rowCountMessageLength ) {
+
+	
+	
+	public SerialUnloader(String name,IParameters parameters) {
 		super();
-		this.connection = connection;
-		this.file = file;
-		this.query = query;
-		this.columnDelimiter = columnDelimiter;
-		this.rowDelimiter = rowDelimiter;
-		this.addColumnNames = addColumnNames;
-		this.dateFormat = dateFormat;
-		this.dateTimeFormat = dateTimeFormat;
-		this.decimalSeperator = decimalSeperator;
-		this.fetchSize = fetchSize;
-		this.rowCountMessageLength=rowCountMessageLength;
+		this.parameters = (UnloaderParameters) parameters;
+		
 		
 		//Date format
 		simpleTimeFormat=new SimpleDateFormat("HH:mm:ss");
-		simpleDateFormat=new SimpleDateFormat(this.dateFormat);
-		simpleDateTimeFormat=new SimpleDateFormat(this.dateTimeFormat);
-		simpleTimeStampFormat=new SimpleDateFormat(this.dateTimeFormat+".S");
+		simpleDateFormat=new SimpleDateFormat(this.parameters.getDateFormat());
+		simpleDateTimeFormat=new SimpleDateFormat(this.parameters.getDateTimeFormat());
+		simpleTimeStampFormat=new SimpleDateFormat(this.parameters.getDateTimeFormat()+".S");
 		
 		//Decimal format
 		DecimalFormatSymbols symbols=new DecimalFormatSymbols();		
-		symbols.setDecimalSeparator(this.decimalSeperator);		
+		symbols.setDecimalSeparator(this.parameters.getDecimalSeperator());		
 		decimalFormat=new DecimalFormat("",symbols);
 		decimalFormat.setGroupingUsed(false);
 		
-		this.threadName=threadName;
-		logger=new Logger(threadName);
+		this.name=name;
+		logger=new Logger(name);
 	}
 
 
@@ -114,25 +113,25 @@ public class SerialUnloader implements Runnable {
 						
 			logger.start();
 		
-			stream=new FileOutputStream(file);
+			stream=new FileOutputStream(this.parameters.getFile());
 			writer=new OutputStreamWriter(stream,"windows-1254");
 			StringBuilder row=new StringBuilder();
 			
 			
 			//run query
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			con=DriverManager.getConnection(connection.getConnectionString(),connection.getUser(),connection.getPassword());
+			con=DriverManager.getConnection(this.parameters.getConnection().getConnectionString(),this.parameters.getConnection().getUser(),this.parameters.getConnection().getPassword());
 			Statement stmt=con.createStatement();
-			stmt.setFetchSize(fetchSize);			
-			ResultSet rs=stmt.executeQuery(query);
-			rs.setFetchSize(fetchSize);
+			stmt.setFetchSize(this.parameters.getFetchSize());			
+			ResultSet rs=stmt.executeQuery(this.parameters.getQuery());
+			rs.setFetchSize(this.parameters.getFetchSize());
 			ResultSetMetaData resultSetMetaData = rs.getMetaData();									
 			boolean firstRow=rs.next();
 						
 			logger.message("Query executed");
 			
 			//columnNames
-			if(addColumnNames && firstRow) {
+			if(this.parameters.isAddColumnNames() &&  firstRow) {
 				String rowColumnNames=getColumnNames(resultSetMetaData);
 				writer.write(rowColumnNames);		
 			}						
@@ -146,7 +145,7 @@ public class SerialUnloader implements Runnable {
 				rowCount++;
 				
 				//rowCountMessaging
-				if(rowCount == rowCountMessageLength) {
+				if(rowCount == this.parameters.getRowCountMessageLength()) {
 					logger.step(rowCount, "rows extracted");
 					rowCount=0;
 				}
@@ -169,7 +168,7 @@ public class SerialUnloader implements Runnable {
 				stream.close();
 				con.close();
 				logger.error();
-				errorListener.onError(threadName,e);				
+				errorListener.onError(this.name,e);				
 			} 
 			catch (Exception e1) {}
 						
@@ -181,11 +180,11 @@ public class SerialUnloader implements Runnable {
 		for(int i=1; i<=resultSetMetaData.getColumnCount(); i++) {
 			sb.append(resultSetMetaData.getColumnName(i));
 			if(i!=resultSetMetaData.getColumnCount()) {
-				sb.append(columnDelimiter);
+				sb.append(this.parameters.getColumnDelimiter());
 			}
 			
 		}
-		sb.append(rowDelimiter);
+		sb.append(this.parameters.getRowDelimiter());
 		return sb.toString();
 	}
 	
@@ -221,12 +220,12 @@ public class SerialUnloader implements Runnable {
 				row.append(columnText);						
 			}
 			if(i!=resultSetMetaData.getColumnCount()) {
-				row.append(columnDelimiter);
+				row.append(this.parameters.getColumnDelimiter());
 			}
 		}
 		hasRowsAfter=rs.next();
 		if(hasRowsAfter) {
-			row.append(rowDelimiter);
+			row.append(this.parameters.getRowDelimiter());
 		}
 	
 		return new RowInfo(row.toString(), hasRowsAfter);
@@ -240,6 +239,8 @@ public class SerialUnloader implements Runnable {
 		unload();
 		
 	}
+	
+	
 	
 	
 }
