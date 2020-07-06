@@ -48,7 +48,17 @@ public class SerialUnloader implements IOracleTool {
 		this.parameters=(UnloaderParameters) parameters;
 	}
 	
+	private int parallelOrder;
 	
+	
+	public int getParallelOrder() {
+		return parallelOrder;
+	}
+	public void setParallelOrder(int parallelOrder) {
+		this.parallelOrder = parallelOrder;
+	}
+
+
 	private Connection con;
 	private FileOutputStream stream;
 	private OutputStreamWriter writer;
@@ -84,7 +94,7 @@ public class SerialUnloader implements IOracleTool {
 
 	
 	
-	public SerialUnloader(String name,IParameters parameters) {
+	public SerialUnloader(String name,IParameters parameters, int parallelOrder) {
 		super();
 		this.parameters = (UnloaderParameters) parameters;
 		
@@ -103,6 +113,8 @@ public class SerialUnloader implements IOracleTool {
 		
 		this.name=name;
 		logger=new Logger(name);
+		
+		this.parallelOrder=parallelOrder;
 	}
 
 
@@ -113,17 +125,28 @@ public class SerialUnloader implements IOracleTool {
 						
 			logger.start();
 		
-			stream=new FileOutputStream(this.parameters.getFile());
+			stream=new FileOutputStream(this.parameters.getFile()+this.parallelOrder);
 			writer=new OutputStreamWriter(stream,"windows-1254");
 			StringBuilder row=new StringBuilder();
 			
 			
 			//run query
+			
+			String query=this.parameters.getQuery();
+			String columns="''||";
+			for(int i=0; i<this.parameters.getParallelDivisorColumns().length; i++) {
+				columns+=this.parameters.getParallelDivisorColumns()[i];
+				if(i != this.parameters.getParallelDivisorColumns().length-1) {
+					columns+="||";
+				}
+			}
+			query="select * from ( " + query + " ) where ora_hash("+columns+","+(this.parameters.getParallelCount()-1)+")="+ (this.parallelOrder-1);
+			
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			con=DriverManager.getConnection(this.parameters.getConnection().getConnectionString(),this.parameters.getConnection().getUser(),this.parameters.getConnection().getPassword());
 			Statement stmt=con.createStatement();
 			stmt.setFetchSize(this.parameters.getFetchSize());			
-			ResultSet rs=stmt.executeQuery(this.parameters.getQuery());
+			ResultSet rs=stmt.executeQuery(query);
 			rs.setFetchSize(this.parameters.getFetchSize());
 			ResultSetMetaData resultSetMetaData = rs.getMetaData();									
 			boolean firstRow=rs.next();

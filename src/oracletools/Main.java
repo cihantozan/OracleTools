@@ -15,6 +15,8 @@ import oracletools.util.OracleConnection;
 //classlara run koy
 //paralellik
 //parallel unload mult.files, paralllel unload one file, parallel loaf from mult. files, parallel transfer
+//unload,load excel
+//jdk nýn önceki versiyonlarýnda da dene
 
 public class Main {
 

@@ -15,6 +15,8 @@ public class UnloaderParameters implements IParameters {
 	private char decimalSeperator; 
 	private int fetchSize;
 	private int rowCountMessageLength;
+	private int parallelCount;
+	private String[] parallelDivisorColumns;
 	
 	public OracleConnection getConnection() {
 		return connection;
@@ -82,6 +84,17 @@ public class UnloaderParameters implements IParameters {
 	public void setRowCountMessageLength(int rowCountMessageLength) {
 		this.rowCountMessageLength = rowCountMessageLength;
 	}
-	
+	public int getParallelCount() {
+		return parallelCount;
+	}
+	public void setParallelCount(int parallelCount) {
+		this.parallelCount = parallelCount;
+	}
+	public String[] getParallelDivisorColumns() {
+		return parallelDivisorColumns;
+	}
+	public void setParallelDivisorColumns(String[] parallelDivisorColumns) {
+		this.parallelDivisorColumns = parallelDivisorColumns;
+	}
 	
 }

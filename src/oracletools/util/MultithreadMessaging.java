@@ -22,6 +22,9 @@ public class MultithreadMessaging {
 		}
 		for (Map.Entry<String, Logger> entry : loggers.entrySet() ) {
 		    str+=entry.getKey()+" - ";
+		    if(errors.get(entry.getKey())) {
+		    	str+= "ERROR ";
+		    }
 		    str+=entry.getValue().getLastMessage();
 		    str+=" || ";
 		}
