@@ -1,8 +1,6 @@
 package oracletools.unloader;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
+import oracletools.util.FileCombiner;
 import oracletools.util.IParameters;
 import oracletools.util.Logger;
 import oracletools.util.MultithreadMessaging;
@@ -32,7 +30,7 @@ public class Unloader {
 	
 	
 	
-	public void unload() throws ClassNotFoundException, SQLException, IOException, InterruptedException {
+	public void unload() throws Exception {
 	
 		for(int i=0;i<this.parameters.getParallelCount();i++) {
 									
@@ -55,11 +53,19 @@ public class Unloader {
 			});
 			
 			threads[i]=new Thread(serialUnloader);			
-			threads[i].start();
+			threads[i].start();			
+		}
+		for(int i=0;i<this.parameters.getParallelCount();i++) {
 			threads[i].join();
 		}
-		
-		
+		if(this.parameters.isCombineFiles()) {
+			String[] files=new String[this.parameters.getParallelCount()];
+			for(int i=0;i<this.parameters.getParallelCount();i++) {
+				files[i]=this.parameters.getFile()+"_"+(i+1);
+			}
+			FileCombiner fileCombiner=new FileCombiner(files, this.parameters.getFile(), this.parameters.getRowDelimiter());
+			fileCombiner.combine();
+		}
 		
 	}
 

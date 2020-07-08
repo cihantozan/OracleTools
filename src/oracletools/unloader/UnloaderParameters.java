@@ -17,7 +17,8 @@ public class UnloaderParameters implements IParameters {
 	private int rowCountMessageLength;
 	private int parallelCount;
 	private String[] parallelDivisorColumns;
-	
+	private boolean combineFiles;
+		
 	public OracleConnection getConnection() {
 		return connection;
 	}
@@ -96,5 +97,10 @@ public class UnloaderParameters implements IParameters {
 	public void setParallelDivisorColumns(String[] parallelDivisorColumns) {
 		this.parallelDivisorColumns = parallelDivisorColumns;
 	}
-	
+	public boolean isCombineFiles() {
+		return combineFiles;
+	}
+	public void setCombineFiles(boolean combineFiles) {
+		this.combineFiles = combineFiles;
+	}	
 }

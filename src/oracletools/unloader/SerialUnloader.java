@@ -124,8 +124,12 @@ public class SerialUnloader implements IOracleTool {
 		try {
 						
 			logger.start();
-		
-			stream=new FileOutputStream(this.parameters.getFile()+this.parallelOrder);
+			
+			String fileName=this.parameters.getFile();
+			if(parallelOrder>0) {
+				fileName+="_"+parallelOrder;
+			}
+			stream=new FileOutputStream(fileName);
 			writer=new OutputStreamWriter(stream,"windows-1254");
 			StringBuilder row=new StringBuilder();
 			
@@ -190,11 +194,12 @@ public class SerialUnloader implements IOracleTool {
 				writer.close();
 				stream.close();
 				con.close();
-				logger.error();
-				errorListener.onError(this.name,e);				
+							
 			} 
 			catch (Exception e1) {}
 						
+			logger.error();
+			errorListener.onError(this.name,e);	
 		}
 	}
 	

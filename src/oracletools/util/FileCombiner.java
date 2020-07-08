@@ -20,7 +20,7 @@ public class FileCombiner {
 		this.targetFileName = targetFileName;
 		this.rowDelimiter=rowDelimiter;
 		
-		logger=new Logger();
+		logger=new Logger("FileCombiner");
 	}
 	
 	public void combine() throws Exception {

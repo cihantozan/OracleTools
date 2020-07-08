@@ -3,7 +3,7 @@ package oracletools;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import oracletools.loader.Loader;
+import oracletools.loader.SerialLoader;
 import oracletools.transfer.Transfer;
 import oracletools.unloader.SerialUnloader;
 import oracletools.util.FileCombiner;
