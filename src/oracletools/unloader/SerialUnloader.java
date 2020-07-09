@@ -127,7 +127,7 @@ public class SerialUnloader implements IOracleTool {
 			
 			String fileName=this.parameters.getFile();
 			if(parallelOrder>0) {
-				fileName+="_"+parallelOrder;
+				fileName = fileName.substring(0, fileName.lastIndexOf("."))  + "_" + parallelOrder + fileName.substring(fileName.lastIndexOf("."));
 			}
 			stream=new FileOutputStream(fileName);
 			writer=new OutputStreamWriter(stream,"windows-1254");
@@ -144,7 +144,7 @@ public class SerialUnloader implements IOracleTool {
 					columns+="||";
 				}
 			}
-			query="select * from ( " + query + " ) where ora_hash("+columns+","+(this.parameters.getParallelCount()-1)+")="+ (this.parallelOrder-1);
+			query="select * from ( " + query + " ) where ora_hash("+columns+","+(this.parameters.getParallelCount()-1)+")="+ (this.parallelOrder-1);						
 			
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			con=DriverManager.getConnection(this.parameters.getConnection().getConnectionString(),this.parameters.getConnection().getUser(),this.parameters.getConnection().getPassword());
@@ -173,14 +173,14 @@ public class SerialUnloader implements IOracleTool {
 				
 				//rowCountMessaging
 				if(rowCount == this.parameters.getRowCountMessageLength()) {
-					logger.step(rowCount, "rows extracted");
+					logger.step(rowCount, "rows");
 					rowCount=0;
 				}
 				
 				hasRows=rowInfo.getHasRowsAfter();
 			}
 			
-			logger.step(rowCount, "rows extracted");		
+			logger.step(rowCount, "rows");		
 									
 			writer.close();
 			stream.close();

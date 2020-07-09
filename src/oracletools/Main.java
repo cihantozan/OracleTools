@@ -6,24 +6,24 @@ import java.sql.SQLException;
 import oracletools.loader.SerialLoader;
 import oracletools.transfer.SerialTransfer;
 import oracletools.unloader.SerialUnloader;
+import oracletools.unloader.Unloader;
+import oracletools.unloader.UnloaderParameters;
 import oracletools.util.FileCombiner;
 import oracletools.util.OracleConnection;
 
 //connectionlar þifreli biçimde kaydedilecek
 //TNS varsa alýnacak
 //parametrelerin default deðerleri???
-//classlara run koy
-//paralellik
-//parallel unload mult.files, paralllel unload one file, parallel loaf from mult. files, parallel transfer
 //unload,load excel
 //jdk nýn önceki versiyonlarýnda da dene
+//loglarý hizala - biri bittiðinde kayma oluyor
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
 		
 		//UNLOADER	
-		/*
+		
 		OracleConnection connection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
 		String file="C:\\Users\\Cihan\\Documents\\export.txt";
 		String query="select * from user1.table1";
@@ -35,10 +35,16 @@ public class Main {
 		char decimalSeperator='.';
 		int fetchSize=1000000;
 		int rowCountMessageLength=1000000;
+		int parallelCount=8;
+		String[] parallelDivisorColumns= {"A"};
+		boolean combineFiles=false;
 		
-		Unloader unloader=new Unloader(connection,file,query,columnDelimiter, rowDelimiter, addColumnNames, dateFormat, dateTimeFormat, decimalSeperator,fetchSize, rowCountMessageLength);
+		UnloaderParameters unloaderParameters=new UnloaderParameters(connection, file, query, columnDelimiter, rowDelimiter, addColumnNames, dateFormat, dateTimeFormat, decimalSeperator, fetchSize, rowCountMessageLength, parallelCount, parallelDivisorColumns, combineFiles); 
+		
+		
+		Unloader unloader=new Unloader(unloaderParameters);
 		unloader.unload();
-		*/
+		
 		
 		
 		//LOADER

@@ -10,11 +10,21 @@ public class MultithreadMessaging {
 	private static boolean hasError=false;
 	
 	
-	public static void onThreadLogActivity(String threadName,Logger logger) {
+	public static synchronized void onThreadLogActivity(String threadName,Logger logger) {
 		if(loggers==null) {
 			loggers=new HashMap<String, Logger>();
 		}		
 		loggers.put(threadName, logger);
+		
+		if(errors==null) {
+			errors=new HashMap<String, Boolean>();
+		}
+		if(!errors.containsKey(threadName)) {
+			errors.put(threadName, false);
+		}
+		
+		
+		
 		
 		String str="";
 		if(errors.get(threadName)) {
@@ -32,7 +42,7 @@ public class MultithreadMessaging {
 		
 	}
 	
-	public static void onThreadError(String threadName, Exception e) {
+	public static synchronized void onThreadError(String threadName, Exception e) {
 		if(errors==null) {
 			errors=new HashMap<String, Boolean>();
 		}

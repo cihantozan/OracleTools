@@ -18,7 +18,32 @@ public class UnloaderParameters implements IParameters {
 	private int parallelCount;
 	private String[] parallelDivisorColumns;
 	private boolean combineFiles;
+	
+	
 		
+	public UnloaderParameters() {		
+	}
+	
+	public UnloaderParameters(OracleConnection connection, String file, String query, String columnDelimiter,
+			String rowDelimiter, boolean addColumnNames, String dateFormat, String dateTimeFormat,
+			char decimalSeperator, int fetchSize, int rowCountMessageLength, int parallelCount,
+			String[] parallelDivisorColumns, boolean combineFiles) {
+		super();
+		this.connection = connection;
+		this.file = file;
+		this.query = query;
+		this.columnDelimiter = columnDelimiter;
+		this.rowDelimiter = rowDelimiter;
+		this.addColumnNames = addColumnNames;
+		this.dateFormat = dateFormat;
+		this.dateTimeFormat = dateTimeFormat;
+		this.decimalSeperator = decimalSeperator;
+		this.fetchSize = fetchSize;
+		this.rowCountMessageLength = rowCountMessageLength;
+		this.parallelCount = parallelCount;
+		this.parallelDivisorColumns = parallelDivisorColumns;
+		this.combineFiles = combineFiles;
+	}
 	public OracleConnection getConnection() {
 		return connection;
 	}

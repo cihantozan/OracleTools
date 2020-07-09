@@ -20,6 +20,29 @@ public class LoaderParameters implements IParameters{
 	private int parallelCount;	
 	
 	
+	public LoaderParameters() {	
+	}
+	
+	public LoaderParameters(OracleConnection connection, String file, String tableName, String columnDelimiter,
+			String rowDelimiter, int skipRowCount, String dateTimeFormat, String timestampFormat, char decimalSeperator,
+			int batchSize, boolean truncateTargetTable, boolean directPathInsert, boolean commitAfterLoad,
+			int parallelCount) {
+		super();
+		this.connection = connection;
+		this.file = file;
+		this.tableName = tableName;
+		this.columnDelimiter = columnDelimiter;
+		this.rowDelimiter = rowDelimiter;
+		this.skipRowCount = skipRowCount;
+		this.dateTimeFormat = dateTimeFormat;
+		this.timestampFormat = timestampFormat;
+		this.decimalSeperator = decimalSeperator;
+		this.batchSize = batchSize;
+		this.truncateTargetTable = truncateTargetTable;
+		this.directPathInsert = directPathInsert;
+		this.commitAfterLoad = commitAfterLoad;
+		this.parallelCount = parallelCount;
+	}
 	public OracleConnection getConnection() {
 		return connection;
 	}

@@ -16,7 +16,8 @@ public class TransferParameters implements IParameters {
 	private int parallelCount;
 	private String[] parallelDivisorColumns;
 	
-	
+	public TransferParameters() {	
+	}
 	
 	public TransferParameters(OracleConnection sourceConnection, OracleConnection targetConnection, String sourceQuery,
 			String targetTable, int batchSize, boolean truncateTargetTable, boolean directPathInsert,
@@ -33,6 +34,8 @@ public class TransferParameters implements IParameters {
 		this.parallelCount = parallelCount;
 		this.parallelDivisorColumns = parallelDivisorColumns;
 	}
+	
+	
 	public OracleConnection getSourceConnection() {
 		return sourceConnection;
 	}

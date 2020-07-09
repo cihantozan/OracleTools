@@ -85,7 +85,7 @@ public class Logger {
 		
 		String totalRowCountString=Util.rpad(decimalFormatWithoutPrecision.format(totalRowCount),14," ");
 		
-		lastMessage = "  " + totalRowCountString + message + " | Step Time:" + stepDiffStr + " | Total Time:" + totalDiffStr + " | Rps:" + rps + " | Total Rps:" + totalRps; 
+		lastMessage = "" + totalRowCountString + message + " | Dur:" + stepDiffStr + "/" + totalDiffStr + " | Rps:" + rps + "/" + totalRps; 
 						
 		prevStepTime=stepTime;
 		
