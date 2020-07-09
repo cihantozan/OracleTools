@@ -49,8 +49,7 @@ public class SerialUnloader implements IOracleTool {
 	}
 	
 	private int parallelOrder;
-	
-	
+		
 	public int getParallelOrder() {
 		return parallelOrder;
 	}
@@ -96,8 +95,9 @@ public class SerialUnloader implements IOracleTool {
 	
 	public SerialUnloader(String name,IParameters parameters, int parallelOrder) {
 		super();
+		this.name=name;
 		this.parameters = (UnloaderParameters) parameters;
-		
+		this.parallelOrder=parallelOrder;
 		
 		//Date format
 		simpleTimeFormat=new SimpleDateFormat("HH:mm:ss");
@@ -111,10 +111,10 @@ public class SerialUnloader implements IOracleTool {
 		decimalFormat=new DecimalFormat("",symbols);
 		decimalFormat.setGroupingUsed(false);
 		
-		this.name=name;
+		
 		logger=new Logger(name);
 		
-		this.parallelOrder=parallelOrder;
+		
 	}
 
 

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import oracletools.loader.SerialLoader;
-import oracletools.transfer.Transfer;
+import oracletools.transfer.SerialTransfer;
 import oracletools.unloader.SerialUnloader;
 import oracletools.util.FileCombiner;
 import oracletools.util.OracleConnection;
