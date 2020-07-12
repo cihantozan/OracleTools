@@ -58,12 +58,27 @@ public class Unloader {
 		for(int i=0;i<this.parameters.getParallelCount();i++) {
 			threads[i].join();
 		}
-		if(this.parameters.isCombineFiles()) {
+		
+		
+		
+		if(this.parameters.getParallelCount()>1 && this.parameters.isCombineFiles()) {
+			MultithreadMessaging.reset();
+			
 			String[] files=new String[this.parameters.getParallelCount()];
-			for(int i=0;i<this.parameters.getParallelCount();i++) {
-				files[i]=this.parameters.getFile()+"_"+(i+1);
+			for(int i=0;i<this.parameters.getParallelCount();i++) {				
+				String fileName=this.parameters.getFile();				
+				files[i] = fileName.substring(0, fileName.lastIndexOf("."))  + "_" + (i+1) + fileName.substring(fileName.lastIndexOf("."));
 			}
 			FileCombiner fileCombiner=new FileCombiner(files, this.parameters.getFile(), this.parameters.getRowDelimiter());
+			
+			fileCombiner.setLoggerActivityListener(new LoggerActivityListener() {
+				
+				@Override
+				public void onLogActivity(String threadName, Logger logger) {
+					MultithreadMessaging.onThreadLogActivity(threadName, logger);					
+				}
+			});
+			
 			fileCombiner.combine();
 		}
 		

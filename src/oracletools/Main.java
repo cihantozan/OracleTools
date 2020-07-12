@@ -16,7 +16,6 @@ import oracletools.util.OracleConnection;
 //parametrelerin default deðerleri???
 //unload,load excel
 //jdk nýn önceki versiyonlarýnda da dene
-//loglarý hizala - biri bittiðinde kayma oluyor
 
 public class Main {
 
@@ -26,7 +25,7 @@ public class Main {
 		
 		OracleConnection connection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
 		String file="C:\\Users\\Cihan\\Documents\\export.txt";
-		String query="select * from user1.table1";
+		String query="select * from user1.table1 where rownum<=1000";
 		String columnDelimiter=";"; 
 		String rowDelimiter="\r\n";
 		boolean addColumnNames=true;
@@ -35,9 +34,9 @@ public class Main {
 		char decimalSeperator='.';
 		int fetchSize=1000000;
 		int rowCountMessageLength=1000000;
-		int parallelCount=8;
+		int parallelCount=1;
 		String[] parallelDivisorColumns= {"A"};
-		boolean combineFiles=false;
+		boolean combineFiles=true;
 		
 		UnloaderParameters unloaderParameters=new UnloaderParameters(connection, file, query, columnDelimiter, rowDelimiter, addColumnNames, dateFormat, dateTimeFormat, decimalSeperator, fetchSize, rowCountMessageLength, parallelCount, parallelDivisorColumns, combineFiles); 
 		

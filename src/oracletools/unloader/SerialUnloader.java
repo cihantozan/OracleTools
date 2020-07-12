@@ -126,7 +126,7 @@ public class SerialUnloader implements IOracleTool {
 			logger.start();
 			
 			String fileName=this.parameters.getFile();
-			if(parallelOrder>0) {
+			if(this.parameters.getParallelCount()>1) {
 				fileName = fileName.substring(0, fileName.lastIndexOf("."))  + "_" + parallelOrder + fileName.substring(fileName.lastIndexOf("."));
 			}
 			stream=new FileOutputStream(fileName);
@@ -144,7 +144,10 @@ public class SerialUnloader implements IOracleTool {
 					columns+="||";
 				}
 			}
-			query="select * from ( " + query + " ) where ora_hash("+columns+","+(this.parameters.getParallelCount()-1)+")="+ (this.parallelOrder-1);						
+			
+			if (this.parameters.getParallelCount()>1) {
+				query = "select * from ( " + query + " ) where ora_hash(" + columns + "," + (this.parameters.getParallelCount() - 1) + ")=" + (this.parallelOrder - 1);
+			}
 			
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			con=DriverManager.getConnection(this.parameters.getConnection().getConnectionString(),this.parameters.getConnection().getUser(),this.parameters.getConnection().getPassword());
@@ -158,7 +161,14 @@ public class SerialUnloader implements IOracleTool {
 			logger.message("Query executed");
 			
 			//columnNames
-			if(this.parameters.isAddColumnNames() &&  firstRow) {
+			if(
+				  this.parameters.isAddColumnNames() 
+				  && firstRow 
+				  && (
+							 (parallelOrder<=1 && this.parameters.isCombineFiles())
+					      || (!this.parameters.isCombineFiles())
+					 )
+			){
 				String rowColumnNames=getColumnNames(resultSetMetaData);
 				writer.write(rowColumnNames);		
 			}						

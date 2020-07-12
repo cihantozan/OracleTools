@@ -52,8 +52,9 @@ public class Logger {
 		//Decimal format for messages
 		DecimalFormatSymbols symbols_m=new DecimalFormatSymbols();		
 		symbols_m.setGroupingSeparator('.');
-		decimalFormatWithoutPrecision=new DecimalFormat("",symbols_m);
+		decimalFormatWithoutPrecision=new DecimalFormat("#,###",symbols_m);
 		decimalFormatWithoutPrecision.setGroupingUsed(true);
+		decimalFormatWithoutPrecision.setDecimalSeparatorAlwaysShown(false);
 		decimalFormatWithPrecision=new DecimalFormat("#,###.00",symbols_m);
 		decimalFormatWithPrecision.setGroupingUsed(true);
 		decimalFormatWithPrecision.setDecimalSeparatorAlwaysShown(true);		
@@ -63,45 +64,62 @@ public class Logger {
 	}
 	
 	public void start() {
-		startTime=LocalDateTime.now();
-		prevStepTime=startTime;
-		lastMessage="Started : " + durDateTimeFormatter.format(startTime);
-		
-		loggerActivityListener.onLogActivity(threadName,this);
+		if (loggerActivityListener != null) {
+			startTime = LocalDateTime.now();
+			prevStepTime = startTime;
+			lastMessage = "Started : " + durDateTimeFormatter.format(startTime);
+			lastMessage = Util.rpad(lastMessage, 60, " ");
+
+			loggerActivityListener.onLogActivity(threadName, this);
+		}
 	}
 	public void message(String message) {
-		LocalDateTime t=LocalDateTime.now();
-		lastMessage=message + " : " + durDateTimeFormatter.format(t);
-		loggerActivityListener.onLogActivity(threadName,this);
+		if (loggerActivityListener != null) {
+			LocalDateTime t = LocalDateTime.now();
+			lastMessage = message + " : " + durDateTimeFormatter.format(t);
+			lastMessage = Util.rpad(lastMessage, 60, " ");
+			loggerActivityListener.onLogActivity(threadName, this);
+		}
 	}
 	public void step(long rowCount, String message) {
-		stepTime=LocalDateTime.now();
-		String stepDiffStr=getDiffTimeString(prevStepTime,stepTime);
-		String totalDiffStr=getDiffTimeString(startTime,stepTime);
-		
-		totalRowCount+=rowCount;
-		String rps=Util.rpad(decimalFormatWithPrecision.format(getRps(prevStepTime, stepTime, rowCount)), 14, " ");
-		String totalRps=Util.rpad(decimalFormatWithPrecision.format(getRps(startTime, stepTime, totalRowCount)), 14, " ");
-		
-		String totalRowCountString=Util.rpad(decimalFormatWithoutPrecision.format(totalRowCount),14," ");
-		
-		lastMessage = "" + totalRowCountString + message + " | Dur:" + stepDiffStr + "/" + totalDiffStr + " | Rps:" + rps + "/" + totalRps; 
-						
-		prevStepTime=stepTime;
-		
-		loggerActivityListener.onLogActivity(threadName,this);
+		if (loggerActivityListener != null) {
+			stepTime = LocalDateTime.now();
+			String stepDiffStr = getDiffTimeString(prevStepTime, stepTime);
+			String totalDiffStr = getDiffTimeString(startTime, stepTime);
+
+			totalRowCount += rowCount;
+			String rps = Util.rpad(decimalFormatWithoutPrecision.format(getRps(prevStepTime, stepTime, rowCount)), 7,
+					" ");
+			String totalRps = Util
+					.rpad(decimalFormatWithoutPrecision.format(getRps(startTime, stepTime, totalRowCount)), 7, " ");
+
+			String totalRowCountString = Util.rpad(decimalFormatWithoutPrecision.format(totalRowCount), 14, " ");
+
+			lastMessage = "" + totalRowCountString /* + message */ + " | Dur:" + stepDiffStr + "/" + totalDiffStr
+					+ " | Rps:" + rps + "/" + totalRps;
+
+			prevStepTime = stepTime;
+
+			loggerActivityListener.onLogActivity(threadName, this);
+		}
 	}
 	public void end() {
-		endTime=LocalDateTime.now();
-		lastMessage="Finished : " + durDateTimeFormatter.format(endTime);
-		
-		loggerActivityListener.onLogActivity(threadName,this);
+		if (loggerActivityListener != null) {
+			endTime = LocalDateTime.now();
+			lastMessage = "Finished : " + durDateTimeFormatter.format(endTime);
+			lastMessage = Util.rpad(lastMessage, 60, " ");
+
+			loggerActivityListener.onLogActivity(threadName, this);
+		}
 	}
 	public void error() {
-		endTime=LocalDateTime.now();
-		lastMessage="Error : " + durDateTimeFormatter.format(endTime);
-		
-		loggerActivityListener.onLogActivity(threadName,this);
+		if (loggerActivityListener != null) {
+			endTime = LocalDateTime.now();
+			lastMessage = "Error : " + durDateTimeFormatter.format(endTime);
+			lastMessage = Util.rpad(lastMessage, 60, " ");
+
+			loggerActivityListener.onLogActivity(threadName, this);
+		}
 	}
 	
 	

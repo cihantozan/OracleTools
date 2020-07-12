@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.channels.FileChannel;
 
+import oracletools.util.listeners.LoggerActivityListener;
+
 public class FileCombiner {
 	
 	private String[] files;
@@ -62,11 +64,21 @@ public class FileCombiner {
 		    logger.step(1, "files merged");
 		}
 		File target=new File(files[0]);
-		File targetNew=new File(target.getParent()+"\\\\"+targetFileName);		
+		//File targetNew=new File(target.getParent()+"\\\\"+targetFileName);
+		File targetNew=new File(targetFileName);
+		targetNew.delete();
 		boolean r=target.renameTo(targetNew);
 		if(!r) throw new Exception("File rename error");
 		
 		logger.end();
+	}
+	
+	
+	public LoggerActivityListener getLoggerActivityListener() {
+		return logger.getLoggerActivityListener();
+	}
+	public void setLoggerActivityListener(LoggerActivityListener loggerActivityListener) {	
+		logger.setLoggerActivityListener(loggerActivityListener);
 	}
 
 }

@@ -31,7 +31,16 @@ public class MultithreadMessaging {
 			str+="ERROR:";
 		}
 		for (Map.Entry<String, Logger> entry : loggers.entrySet() ) {
-		    str+=entry.getKey()+" - ";
+			
+			String name=entry.getKey();
+			if(name.length()>15) {
+				name=name.substring(name.length()-15, name.length()-1);
+			}
+			else {
+				name=Util.rpad(name, 15, " ");
+			}
+			
+		    str+=name+" - ";
 		    if(errors.get(entry.getKey())) {
 		    	str+= "ERROR ";
 		    }
@@ -53,6 +62,11 @@ public class MultithreadMessaging {
 		}
 		
 		e.printStackTrace();
+	}
+	
+	public static void reset() {
+		loggers=null;
+		errors=null;
 	}
 	
 }
