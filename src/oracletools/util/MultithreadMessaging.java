@@ -1,6 +1,7 @@
 package oracletools.util;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MultithreadMessaging {
@@ -12,7 +13,7 @@ public class MultithreadMessaging {
 	
 	public static synchronized void onThreadLogActivity(String threadName,Logger logger) {
 		if(loggers==null) {
-			loggers=new HashMap<String, Logger>();
+			loggers=new LinkedHashMap<String, Logger>();
 		}		
 		loggers.put(threadName, logger);
 		

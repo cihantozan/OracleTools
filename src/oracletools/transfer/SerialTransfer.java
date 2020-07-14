@@ -77,6 +77,27 @@ public class SerialTransfer implements IOracleTool {
 		logger=new Logger(name);
 	}
 	
+	public void truncateTable() {
+		Connection cont=null;
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			cont = DriverManager.getConnection(this.parameters.getTargetConnection().getConnectionString(),
+					this.parameters.getTargetConnection().getUser(), this.parameters.getTargetConnection().getPassword());
+			Statement stmt = cont.createStatement();
+			stmt.executeUpdate("truncate table " + this.parameters.getTargetTable());
+			cont.close();
+			logger.message("Truncated");
+		} catch (Exception e) {
+			try {
+				cont.close();				
+			} catch (Exception e1) {
+			}
+
+			logger.error();
+			errorListener.onError(this.name, e);
+		}
+	}
+	
 	public void transfer() {
 		
 		try {
@@ -122,10 +143,8 @@ public class SerialTransfer implements IOracleTool {
 			}
 			
 			
-			if(this.parameters.isTruncateTargetTable()) {
-				Statement truncateStmt=targetCon.createStatement();
-				truncateStmt.executeUpdate("truncate table " + this.parameters.getTargetTable());
-				logger.message("Truncated");
+			if(this.parameters.isTruncateTargetTable() && this.parameters.getParallelCount()==1) {
+				truncateTable();
 			}
 			
 			

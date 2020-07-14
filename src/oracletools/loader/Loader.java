@@ -26,9 +26,29 @@ public class Loader {
 	
 	public void load() throws InterruptedException {
 		
-		if(this.parameters.getParallelCount()>0) {
+		if(this.parameters.getParallelCount()>1) {
 			this.parameters.setDirectPathInsert(false);
 		}
+		
+		if(this.parameters.getParallelCount()>1 && this.parameters.isTruncateTargetTable()) {
+			SerialLoader serialLoader = new SerialLoader("Truncate", parameters, 1);
+			serialLoader.setErrorListener(new ErrorListener() {				
+				@Override
+				public void onError(String threadName, Exception e) {
+					MultithreadMessaging.onThreadError(threadName,e);
+					
+				}
+			});
+			
+			serialLoader.setLoggerActivityListener(new LoggerActivityListener() {				
+				@Override
+				public void onLogActivity(String threadName, Logger logger) {
+					MultithreadMessaging.onThreadLogActivity(threadName, logger);
+				}
+			});
+			serialLoader.truncateTable();
+		}
+		MultithreadMessaging.reset();
 		
 		for(int i=0;i<this.parameters.getParallelCount();i++) {
 			

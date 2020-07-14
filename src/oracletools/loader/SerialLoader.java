@@ -83,7 +83,26 @@ public class SerialLoader implements IOracleTool {
 		logger.setLoggerActivityListener(loggerActivityListener);
 	}
 	
-	
+	public void truncateTable() {
+		Connection cont=null;
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			cont = DriverManager.getConnection(this.parameters.getConnection().getConnectionString(),
+					this.parameters.getConnection().getUser(), this.parameters.getConnection().getPassword());
+			Statement stmt = cont.createStatement();
+			stmt.executeUpdate("truncate table " + this.parameters.getTableName());
+			cont.close();
+			logger.message("Truncated");
+		} catch (Exception e) {
+			try {
+				cont.close();				
+			} catch (Exception e1) {
+			}
+
+			logger.error();
+			errorListener.onError(this.name, e);
+		}
+	}
 	public void load() {
 		
 		try {
@@ -139,15 +158,14 @@ public class SerialLoader implements IOracleTool {
 			stmt.executeUpdate(nlsDate);
 			stmt.executeUpdate(nlsTimestamp);
 			
-			if(this.parameters.isTruncateTargetTable()) {
-				stmt.executeUpdate("truncate table "+this.parameters.getTableName());
-				logger.message("Truncated");
+			if(this.parameters.isTruncateTargetTable() && this.parameters.getParallelCount()==1) {
+				truncateTable();
 			}
 			
 			//load
 			String fileName=this.parameters.getFile();
-			if(parallelOrder>0) {
-				fileName+="_"+parallelOrder;				
+			if(this.parameters.getParallelCount()>1) {
+				fileName = fileName.substring(0, fileName.lastIndexOf("."))  + "_" + parallelOrder + fileName.substring(fileName.lastIndexOf("."));
 			}
 			scanner = new Scanner(new File(fileName),"windows-1254");
 			scanner.useDelimiter(this.parameters.getRowDelimiter());

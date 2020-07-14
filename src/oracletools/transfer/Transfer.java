@@ -15,10 +15,10 @@ public class Transfer {
 	public Transfer() {		
 	}
 
-	public Transfer(TransferParameters parameters, Thread[] threads) {
+	public Transfer(TransferParameters parameters) {
 		super();
-		this.parameters = parameters;
-		this.threads = threads;
+		this.parameters = parameters;	
+		this.threads=new Thread[this.parameters.getParallelCount()];
 	}
 	
 	public TransferParameters getParameters() {
@@ -39,6 +39,26 @@ public void transfer() throws InterruptedException {
 		if(this.parameters.getParallelCount()>0) {
 			this.parameters.setDirectPathInsert(false);
 		}
+		
+		if(this.parameters.getParallelCount()>1 && this.parameters.isTruncateTargetTable()) {
+			SerialTransfer serialTransfer = new SerialTransfer("Truncate", parameters, 1);
+			serialTransfer.setErrorListener(new ErrorListener() {				
+				@Override
+				public void onError(String threadName, Exception e) {
+					MultithreadMessaging.onThreadError(threadName,e);
+					
+				}
+			});
+			
+			serialTransfer.setLoggerActivityListener(new LoggerActivityListener() {				
+				@Override
+				public void onLogActivity(String threadName, Logger logger) {
+					MultithreadMessaging.onThreadLogActivity(threadName, logger);
+				}
+			});
+			serialTransfer.truncateTable();
+		}
+		MultithreadMessaging.reset();
 		
 		for(int i=0;i<this.parameters.getParallelCount();i++) {
 			

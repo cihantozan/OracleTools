@@ -3,8 +3,12 @@ package oracletools;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import oracletools.loader.Loader;
+import oracletools.loader.LoaderParameters;
 import oracletools.loader.SerialLoader;
 import oracletools.transfer.SerialTransfer;
+import oracletools.transfer.Transfer;
+import oracletools.transfer.TransferParameters;
 import oracletools.unloader.SerialUnloader;
 import oracletools.unloader.Unloader;
 import oracletools.unloader.UnloaderParameters;
@@ -23,6 +27,7 @@ public class Main {
 		
 		//UNLOADER	
 		
+		/*
 		OracleConnection connection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
 		String file="C:\\Users\\Cihan\\Documents\\export.txt";
 		String query="select * from user1.table1 where rownum<=1000";
@@ -34,16 +39,16 @@ public class Main {
 		char decimalSeperator='.';
 		int fetchSize=1000000;
 		int rowCountMessageLength=1000000;
-		int parallelCount=1;
+		int parallelCount=8;
 		String[] parallelDivisorColumns= {"A"};
-		boolean combineFiles=true;
+		boolean combineFiles=false;
 		
 		UnloaderParameters unloaderParameters=new UnloaderParameters(connection, file, query, columnDelimiter, rowDelimiter, addColumnNames, dateFormat, dateTimeFormat, decimalSeperator, fetchSize, rowCountMessageLength, parallelCount, parallelDivisorColumns, combineFiles); 
 		
 		
 		Unloader unloader=new Unloader(unloaderParameters);
 		unloader.unload();
-		
+		*/
 		
 		
 		//LOADER
@@ -61,25 +66,31 @@ public class Main {
 		boolean truncateTargetTable=true;
 		boolean directPathInsert=false;
 		boolean commitAfterLoad=false;
+		int parallelCount=8;
 		
-		Loader loader = new Loader(connection, file, tableName, columnDelimiter, rowDelimiter, skipRowCount, dateTimeFormat, timestampFormat, decimalSeperator, batchSize, truncateTargetTable, directPathInsert, commitAfterLoad);
+		LoaderParameters loaderParameters = new LoaderParameters(connection, file, tableName, columnDelimiter, rowDelimiter, skipRowCount, dateTimeFormat, timestampFormat, decimalSeperator, batchSize, truncateTargetTable, directPathInsert, commitAfterLoad, parallelCount); 
+		
+		Loader loader = new Loader(loaderParameters);
 		loader.load();
 		*/
 		
 		//TRANSFER
-		/*
+		
 		OracleConnection sourceConnection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
 		OracleConnection targetConnection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
-		String sourceQuery="select * from user1.table1";
+		String sourceQuery="select * from user1.table1 where rownum<=1000";
 		String targetTable="user1.table2";
 		int batchSize=500000;	
 		boolean truncateTargetTable=true;
 		boolean directPathInsert=true;
 		boolean commitAfterLoad=false;
+		int parallelCount=8;
+		String[] parallelDivisorColumns= {"A"};
 		
-		Transfer transfer=new Transfer(sourceConnection, targetConnection, sourceQuery, targetTable, batchSize, truncateTargetTable, directPathInsert, commitAfterLoad);
+		TransferParameters transferParameters=new TransferParameters(sourceConnection, targetConnection, sourceQuery, targetTable, batchSize, truncateTargetTable, directPathInsert, commitAfterLoad, parallelCount, parallelDivisorColumns);
+		Transfer transfer=new Transfer(transferParameters);
 		transfer.transfer();
-		*/
+		
 		
 		/*
 		String[] files = {"C:\\Users\\Cihan\\Documents\\a_1.txt","C:\\Users\\Cihan\\Documents\\a_2.txt","C:\\Users\\Cihan\\Documents\\a_3.txt","C:\\Users\\Cihan\\Documents\\a_4.txt"};
