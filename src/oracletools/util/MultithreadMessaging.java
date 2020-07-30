@@ -70,4 +70,8 @@ public class MultithreadMessaging {
 		errors=null;
 	}
 	
+	public static void printMessage(String message) {
+		System.out.println(message);
+	}
+	
 }

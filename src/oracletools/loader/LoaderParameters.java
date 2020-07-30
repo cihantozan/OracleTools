@@ -43,6 +43,9 @@ public class LoaderParameters implements IParameters{
 		this.commitAfterLoad = commitAfterLoad;
 		this.parallelCount = parallelCount;
 	}
+	
+	
+	
 	public OracleConnection getConnection() {
 		return connection;
 	}

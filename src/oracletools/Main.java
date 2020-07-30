@@ -1,7 +1,11 @@
 package oracletools;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import oracletools.loader.Loader;
 import oracletools.loader.LoaderParameters;
@@ -20,14 +24,17 @@ import oracletools.util.OracleConnection;
 //parametrelerin default deðerleri???
 //unload,load excel
 //jdk nýn önceki versiyonlarýnda da dene
+//parametrelerin config dosyasýndan alýnmasý
+//unloaderda türkçe karakter problemi var.
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
 		
+		
 		//UNLOADER	
 		
-		/*
+		
 		OracleConnection connection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
 		String file="C:\\Users\\Cihan\\Documents\\export.txt";
 		String query="select * from user1.table1 where rownum<=1000";
@@ -39,16 +46,22 @@ public class Main {
 		char decimalSeperator='.';
 		int fetchSize=1000000;
 		int rowCountMessageLength=1000000;
-		int parallelCount=8;
+		int parallelCount=4;
 		String[] parallelDivisorColumns= {"A"};
-		boolean combineFiles=false;
+		boolean combineFiles=true;
 		
 		UnloaderParameters unloaderParameters=new UnloaderParameters(connection, file, query, columnDelimiter, rowDelimiter, addColumnNames, dateFormat, dateTimeFormat, decimalSeperator, fetchSize, rowCountMessageLength, parallelCount, parallelDivisorColumns, combineFiles); 
 		
 		
 		Unloader unloader=new Unloader(unloaderParameters);
 		unloader.unload();
+		
+		
+		/*
+		Unloader unloader=new Unloader();
+		unloader.unload();
 		*/
+
 		
 		
 		//LOADER
@@ -66,7 +79,7 @@ public class Main {
 		boolean truncateTargetTable=true;
 		boolean directPathInsert=false;
 		boolean commitAfterLoad=false;
-		int parallelCount=8;
+		int parallelCount=1;
 		
 		LoaderParameters loaderParameters = new LoaderParameters(connection, file, tableName, columnDelimiter, rowDelimiter, skipRowCount, dateTimeFormat, timestampFormat, decimalSeperator, batchSize, truncateTargetTable, directPathInsert, commitAfterLoad, parallelCount); 
 		
@@ -75,7 +88,7 @@ public class Main {
 		*/
 		
 		//TRANSFER
-		
+		/*
 		OracleConnection sourceConnection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
 		OracleConnection targetConnection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
 		String sourceQuery="select * from user1.table1 where rownum<=1000";
@@ -84,12 +97,13 @@ public class Main {
 		boolean truncateTargetTable=true;
 		boolean directPathInsert=true;
 		boolean commitAfterLoad=false;
-		int parallelCount=8;
+		int parallelCount=2;
 		String[] parallelDivisorColumns= {"A"};
 		
 		TransferParameters transferParameters=new TransferParameters(sourceConnection, targetConnection, sourceQuery, targetTable, batchSize, truncateTargetTable, directPathInsert, commitAfterLoad, parallelCount, parallelDivisorColumns);
 		Transfer transfer=new Transfer(transferParameters);
 		transfer.transfer();
+		*/
 		
 		
 		/*

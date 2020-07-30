@@ -1,0 +1,27 @@
+<parameters>
+<dbUser>USER1</dbUser>
+<dbPassword>Tvn279um</dbPassword>
+<dbHost>localhost</dbHost>
+<dbPort>1521</dbPort>
+<dbName>ORCL</dbName>
+<file>C:\Users\Cihan\Documents\export.txt</file>
+<columnDelimiter>;</columnDelimiter> 
+<rowDelimiter>
+</rowDelimiter>
+<addColumnNames>true</addColumnNames>
+<dateFormat>dd.MM.yyyy</dateFormat>
+<dateTimeFormat>dd.MM.yyyy HH:mm:ss</dateTimeFormat>
+<decimalSeperator>.</decimalSeperator>
+<fetchSize>1000000</fetchSize>
+<rowCountMessageLength>1000000</rowCountMessageLength>
+<parallelCount>4</parallelCount>
+<parallelDivisorColumns>A</parallelDivisorColumns>
+<combineFiles>true</combineFiles>
+<query>
+ <![CDATA[
+select * 
+from user1.table1
+where rownum<=3000
+]]>
+</query>
+</parameters>

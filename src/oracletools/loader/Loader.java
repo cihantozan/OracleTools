@@ -26,8 +26,9 @@ public class Loader {
 	
 	public void load() throws InterruptedException {
 		
-		if(this.parameters.getParallelCount()>1) {
+		if(this.parameters.isDirectPathInsert() && this.parameters.getParallelCount()>1) {
 			this.parameters.setDirectPathInsert(false);
+			MultithreadMessaging.printMessage("Direct Path Insert is disabled because parallel count="+this.parameters.getParallelCount());
 		}
 		
 		if(this.parameters.getParallelCount()>1 && this.parameters.isTruncateTargetTable()) {

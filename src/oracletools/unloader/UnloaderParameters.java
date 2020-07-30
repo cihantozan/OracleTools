@@ -1,5 +1,7 @@
 package oracletools.unloader;
 
+import java.util.Arrays;
+
 import oracletools.util.IParameters;
 import oracletools.util.OracleConnection;
 
@@ -44,6 +46,8 @@ public class UnloaderParameters implements IParameters {
 		this.parallelDivisorColumns = parallelDivisorColumns;
 		this.combineFiles = combineFiles;
 	}
+		
+	
 	public OracleConnection getConnection() {
 		return connection;
 	}
@@ -127,5 +131,17 @@ public class UnloaderParameters implements IParameters {
 	}
 	public void setCombineFiles(boolean combineFiles) {
 		this.combineFiles = combineFiles;
-	}	
+	}
+
+	@Override
+	public String toString() {
+		return "UnloaderParameters [connection=" + connection + ", file=" + file + ", query=" + query
+				+ ", columnDelimiter=" + columnDelimiter + ", rowDelimiter=" + rowDelimiter + ", addColumnNames="
+				+ addColumnNames + ", dateFormat=" + dateFormat + ", dateTimeFormat=" + dateTimeFormat
+				+ ", decimalSeperator=" + decimalSeperator + ", fetchSize=" + fetchSize + ", rowCountMessageLength="
+				+ rowCountMessageLength + ", parallelCount=" + parallelCount + ", parallelDivisorColumns="
+				+ Arrays.toString(parallelDivisorColumns) + ", combineFiles=" + combineFiles + "]";
+	}
+	
+	
 }

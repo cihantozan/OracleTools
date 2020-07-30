@@ -1,9 +1,18 @@
 package oracletools.unloader;
 
+import java.io.IOException;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
+import oracletools.util.ConfigReader;
 import oracletools.util.FileCombiner;
 import oracletools.util.IParameters;
 import oracletools.util.Logger;
 import oracletools.util.MultithreadMessaging;
+import oracletools.util.OracleConnection;
 import oracletools.util.listeners.ErrorListener;
 import oracletools.util.listeners.LoggerActivityListener;
 
@@ -27,7 +36,29 @@ public class Unloader {
 		this.parameters=(UnloaderParameters)parameters;		
 		this.threads=new Thread[this.parameters.getParallelCount()];
 	}
-	
+	public Unloader() throws ParserConfigurationException, SAXException, IOException {
+		ConfigReader configReader=new ConfigReader();
+		Map<String, String> xmlParameters = configReader.read("unloaderConfig.xml");	
+		
+		parameters=new UnloaderParameters();
+		parameters.setConnection(new OracleConnection(xmlParameters.get("dbUser"), xmlParameters.get("dbPassword"), xmlParameters.get("dbHost"), Integer.parseInt(xmlParameters.get("dbPort")), xmlParameters.get("dbName")));
+		parameters.setFile(xmlParameters.get("file"));
+		parameters.setQuery(xmlParameters.get("query"));
+		parameters.setColumnDelimiter(xmlParameters.get("columnDelimiter"));
+		parameters.setRowDelimiter(xmlParameters.get("rowDelimiter"));
+		parameters.setAddColumnNames(Boolean.parseBoolean(xmlParameters.get("addColumnNames")));
+		parameters.setDateFormat(xmlParameters.get("dateFormat"));
+		parameters.setDateTimeFormat(xmlParameters.get("dateTimeFormat"));
+		parameters.setDecimalSeperator(xmlParameters.get("decimalSeperator").charAt(0));
+		parameters.setFetchSize(Integer.parseInt(xmlParameters.get("fetchSize")));
+		parameters.setRowCountMessageLength(Integer.parseInt(xmlParameters.get("rowCountMessageLength")));
+		parameters.setParallelCount(Integer.parseInt(xmlParameters.get("parallelCount")));
+		parameters.setParallelDivisorColumns(xmlParameters.get("parallelDivisorColumns").split(","));
+		parameters.setCombineFiles(Boolean.parseBoolean(xmlParameters.get("combineFiles")));
+		
+		this.threads=new Thread[this.parameters.getParallelCount()];
+		
+	}	
 	
 	
 	public void unload() throws Exception {
