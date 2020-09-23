@@ -25,7 +25,8 @@ import oracletools.util.OracleConnection;
 //unload,load excel
 //jdk nýn önceki versiyonlarýnda da dene
 //parametrelerin config dosyasýndan alýnmasý
-//unloaderda türkçe karakter problemi var.
+//karakter seti parametrik olsun
+//farklý teknolojiler için altyapý
 
 public class Main {
 
@@ -34,7 +35,7 @@ public class Main {
 		
 		//UNLOADER	
 		
-		
+		/*
 		OracleConnection connection=new OracleConnection("USER1", "Tvn279um", "localhost", 1521, "ORCL");
 		String file="C:\\Users\\Cihan\\Documents\\export.txt";
 		String query="select * from user1.table1 where rownum<=1000";
@@ -48,14 +49,14 @@ public class Main {
 		int rowCountMessageLength=1000000;
 		int parallelCount=4;
 		String[] parallelDivisorColumns= {"A"};
-		boolean combineFiles=true;
+		boolean combineFiles=false;
 		
 		UnloaderParameters unloaderParameters=new UnloaderParameters(connection, file, query, columnDelimiter, rowDelimiter, addColumnNames, dateFormat, dateTimeFormat, decimalSeperator, fetchSize, rowCountMessageLength, parallelCount, parallelDivisorColumns, combineFiles); 
 		
 		
 		Unloader unloader=new Unloader(unloaderParameters);
 		unloader.unload();
-		
+		*/
 		
 		/*
 		Unloader unloader=new Unloader();
@@ -86,6 +87,9 @@ public class Main {
 		Loader loader = new Loader(loaderParameters);
 		loader.load();
 		*/
+		
+		Loader loader = new Loader();
+		loader.load();
 		
 		//TRANSFER
 		/*

@@ -1,0 +1,21 @@
+<parameters>
+<dbUser>USER1</dbUser>
+<dbPassword>Tvn279um</dbPassword>
+<dbHost>localhost</dbHost>
+<dbPort>1521</dbPort>
+<dbName>ORCL</dbName>
+<file>C:\Users\Cihan\Documents\export.txt</file>
+<tableName>user1.table2</tableName>
+<columnDelimiter>;</columnDelimiter> 
+<rowDelimiter>
+</rowDelimiter>
+<skipRowCount>1</skipRowCount>
+<dateTimeFormat>dd.mm.yyyy hh24:mi:ss</dateTimeFormat>
+<timestampFormat>dd.mm.yyyy hh24:mi:ss.ff</timestampFormat>
+<decimalSeperator>.</decimalSeperator>
+<batchSize>1000000</batchSize>
+<truncateTargetTable>true</truncateTargetTable>
+<directPathInsert>false</directPathInsert>
+<commitAfterLoad>false</commitAfterLoad>
+<parallelCount>1</parallelCount>
+</parameters>

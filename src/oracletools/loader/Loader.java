@@ -1,8 +1,17 @@
 package oracletools.loader;
 
+import java.io.IOException;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
+import oracletools.util.ConfigReader;
 import oracletools.util.IParameters;
 import oracletools.util.Logger;
 import oracletools.util.MultithreadMessaging;
+import oracletools.util.OracleConnection;
 import oracletools.util.listeners.ErrorListener;
 import oracletools.util.listeners.LoggerActivityListener;
 
@@ -23,6 +32,31 @@ public class Loader {
 		this.parameters=(LoaderParameters)parameters;
 		this.threads=new Thread[this.parameters.getParallelCount()];
 	}
+	
+	public Loader() throws ParserConfigurationException, SAXException, IOException {
+		super();
+		ConfigReader configReader=new ConfigReader();
+		Map<String, String> xmlParameters = configReader.read("loaderConfig.xml");
+		
+		this.parameters=new LoaderParameters();
+		parameters.setConnection(new OracleConnection(xmlParameters.get("dbUser"), xmlParameters.get("dbPassword"), xmlParameters.get("dbHost"), Integer.parseInt(xmlParameters.get("dbPort")), xmlParameters.get("dbName")));
+		parameters.setFile(xmlParameters.get("file"));
+		parameters.setTableName(xmlParameters.get("tableName"));
+		parameters.setColumnDelimiter(xmlParameters.get("columnDelimiter"));
+		parameters.setRowDelimiter(xmlParameters.get("rowDelimiter"));
+		parameters.setSkipRowCount(Integer.parseInt(xmlParameters.get("skipRowCount")));
+		parameters.setDateTimeFormat(xmlParameters.get("dateTimeFormat"));
+		parameters.setTimestampFormat(xmlParameters.get("timestampFormat"));
+		parameters.setDecimalSeperator(xmlParameters.get("decimalSeperator").toCharArray()[0]);
+		parameters.setBatchSize(Integer.parseInt(xmlParameters.get("batchSize")));
+		parameters.setTruncateTargetTable(Boolean.parseBoolean(xmlParameters.get("truncateTargetTable")));
+		parameters.setDirectPathInsert(Boolean.parseBoolean(xmlParameters.get("directPathInsert")));
+		parameters.setCommitAfterLoad(Boolean.parseBoolean(xmlParameters.get("commitAfterLoad")));
+		parameters.setParallelCount(Integer.parseInt(xmlParameters.get("parallelCount")));
+		
+		this.threads=new Thread[this.parameters.getParallelCount()];
+	}
+	
 	
 	public void load() throws InterruptedException {
 		
