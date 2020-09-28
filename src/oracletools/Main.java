@@ -24,7 +24,6 @@ import oracletools.util.OracleConnection;
 //parametrelerin default deðerleri???
 //unload,load excel
 //jdk nýn önceki versiyonlarýnda da dene
-//parametrelerin config dosyasýndan alýnmasý
 //karakter seti parametrik olsun
 //farklý teknolojiler için altyapý
 
@@ -88,8 +87,10 @@ public class Main {
 		loader.load();
 		*/
 		
+		/*
 		Loader loader = new Loader();
 		loader.load();
+		*/
 		
 		//TRANSFER
 		/*
@@ -108,6 +109,9 @@ public class Main {
 		Transfer transfer=new Transfer(transferParameters);
 		transfer.transfer();
 		*/
+		
+		Transfer transfer=new Transfer();
+		transfer.transfer();
 		
 		
 		/*

@@ -1,7 +1,16 @@
 package oracletools.transfer;
 
+import java.io.IOException;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
+import oracletools.util.ConfigReader;
 import oracletools.util.Logger;
 import oracletools.util.MultithreadMessaging;
+import oracletools.util.OracleConnection;
 import oracletools.util.listeners.ErrorListener;
 import oracletools.util.listeners.LoggerActivityListener;
 
@@ -12,7 +21,24 @@ public class Transfer {
 	
 	
 	
-	public Transfer() {		
+	public Transfer() throws ParserConfigurationException, SAXException, IOException {	
+		super();
+		ConfigReader configReader=new ConfigReader();
+		Map<String, String> xmlParameters = configReader.read("transferConfig.xml");
+		
+		this.parameters=new TransferParameters();
+		parameters.setSourceConnection(new OracleConnection(xmlParameters.get("sourceDbUser"), xmlParameters.get("sourceDbPassword"), xmlParameters.get("sourceDbHost"), Integer.parseInt(xmlParameters.get("sourceDbPort")), xmlParameters.get("sourceDbName")));
+		parameters.setTargetConnection(new OracleConnection(xmlParameters.get("targetDbUser"), xmlParameters.get("targetDbPassword"), xmlParameters.get("targetDbHost"), Integer.parseInt(xmlParameters.get("targetDbPort")), xmlParameters.get("targetDbName")));
+		parameters.setSourceQuery(xmlParameters.get("sourceQuery"));
+		parameters.setTargetTable(xmlParameters.get("targetTable"));
+		parameters.setBatchSize(Integer.parseInt(xmlParameters.get("batchSize")));
+		parameters.setTruncateTargetTable(Boolean.parseBoolean(xmlParameters.get("truncateTargetTable")));
+		parameters.setDirectPathInsert(Boolean.parseBoolean(xmlParameters.get("directPathInsert")));
+		parameters.setCommitAfterLoad(Boolean.parseBoolean(xmlParameters.get("commitAfterLoad")));
+		parameters.setParallelCount(Integer.parseInt(xmlParameters.get("parallelCount")));
+		parameters.setParallelDivisorColumns(xmlParameters.get("parallelDivisorColumns").split(","));
+		
+		this.threads=new Thread[this.parameters.getParallelCount()];
 	}
 
 	public Transfer(TransferParameters parameters) {
