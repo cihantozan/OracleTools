@@ -1,6 +1,7 @@
 package oracletools.unloader;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -15,11 +16,15 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import oracletools.util.IOracleTool;
 import oracletools.util.IParameters;
 import oracletools.util.Logger;
 import oracletools.util.listeners.ErrorListener;
 import oracletools.util.listeners.LoggerActivityListener;
+
 
 
 
@@ -267,6 +272,63 @@ public class SerialUnloader implements IOracleTool {
 		}
 	
 		return new RowInfo(row.toString(), hasRowsAfter);
+	}
+	
+	public void unloadExcel() throws IOException, ClassNotFoundException, SQLException {
+		
+		logger.start();
+		
+		String fileName=this.parameters.getFile();
+		if(this.parameters.getParallelCount()>1) {
+			fileName = fileName.substring(0, fileName.lastIndexOf("."))  + "_" + parallelOrder + fileName.substring(fileName.lastIndexOf("."));
+		}
+		
+		
+		//run query
+		
+		String query=this.parameters.getQuery();
+		String columns="''||";
+		for(int i=0; i<this.parameters.getParallelDivisorColumns().length; i++) {
+			columns+=this.parameters.getParallelDivisorColumns()[i];
+			if(i != this.parameters.getParallelDivisorColumns().length-1) {
+				columns+="||";
+			}
+		}
+		
+		if (this.parameters.getParallelCount()>1) {
+			query = "select * from ( " + query + " ) where ora_hash(" + columns + "," + (this.parameters.getParallelCount() - 1) + ")=" + (this.parallelOrder - 1);
+		}
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		con=DriverManager.getConnection(this.parameters.getConnection().getConnectionString(),this.parameters.getConnection().getUser(),this.parameters.getConnection().getPassword());
+		Statement stmt=con.createStatement();
+		stmt.setFetchSize(this.parameters.getFetchSize());			
+		ResultSet rs=stmt.executeQuery(query);
+		rs.setFetchSize(this.parameters.getFetchSize());
+		ResultSetMetaData resultSetMetaData = rs.getMetaData();									
+		boolean firstRow=rs.next();
+					
+		logger.message("Query executed");
+		
+		
+		XSSFWorkbook workbook=new XSSFWorkbook(fileName);
+		XSSFSheet sheet = workbook.createSheet("Sheet1");
+		
+		
+		//columnNames
+		if(
+			  this.parameters.isAddColumnNames() 
+			  && firstRow 
+			  && (
+						 (parallelOrder<=1 && this.parameters.isCombineFiles())
+				      || (!this.parameters.isCombineFiles())
+				 )
+		){
+			String rowColumnNames=getColumnNames(resultSetMetaData);
+			writer.write(rowColumnNames);		
+		}		
+		
+		
 	}
 
 
