@@ -14,9 +14,9 @@
 <decimalSeperator>.</decimalSeperator>
 <fetchSize>1000000</fetchSize>
 <rowCountMessageLength>1000000</rowCountMessageLength>
-<parallelCount>4</parallelCount>
+<parallelCount>1</parallelCount>
 <parallelDivisorColumns>A</parallelDivisorColumns>
-<combineFiles>true</combineFiles>
+<combineFiles>false</combineFiles>
 <query>
  <![CDATA[
 select * 
@@ -24,4 +24,5 @@ from user1.table1
 where rownum<=3000
 ]]>
 </query>
+<fileType>Excel</fileType>
 </parameters>

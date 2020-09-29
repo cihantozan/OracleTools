@@ -5,6 +5,11 @@ import java.util.Arrays;
 import oracletools.util.IParameters;
 import oracletools.util.OracleConnection;
 
+enum FileType
+{
+	Text, Excel
+}
+
 public class UnloaderParameters implements IParameters {
 	private OracleConnection connection;
 	private String file;
@@ -20,6 +25,7 @@ public class UnloaderParameters implements IParameters {
 	private int parallelCount;
 	private String[] parallelDivisorColumns;
 	private boolean combineFiles;
+	private FileType fileType;
 	
 	
 		
@@ -29,7 +35,7 @@ public class UnloaderParameters implements IParameters {
 	public UnloaderParameters(OracleConnection connection, String file, String query, String columnDelimiter,
 			String rowDelimiter, boolean addColumnNames, String dateFormat, String dateTimeFormat,
 			char decimalSeperator, int fetchSize, int rowCountMessageLength, int parallelCount,
-			String[] parallelDivisorColumns, boolean combineFiles) {
+			String[] parallelDivisorColumns, boolean combineFiles, FileType fileType) {
 		super();
 		this.connection = connection;
 		this.file = file;
@@ -45,6 +51,7 @@ public class UnloaderParameters implements IParameters {
 		this.parallelCount = parallelCount;
 		this.parallelDivisorColumns = parallelDivisorColumns;
 		this.combineFiles = combineFiles;
+		this.fileType=fileType;
 	}
 		
 	
@@ -131,6 +138,14 @@ public class UnloaderParameters implements IParameters {
 	}
 	public void setCombineFiles(boolean combineFiles) {
 		this.combineFiles = combineFiles;
+	}	
+
+	public FileType getFileType() {
+		return fileType;
+	}
+
+	public void setFileType(FileType fileType) {
+		this.fileType = fileType;
 	}
 
 	@Override
@@ -140,7 +155,8 @@ public class UnloaderParameters implements IParameters {
 				+ addColumnNames + ", dateFormat=" + dateFormat + ", dateTimeFormat=" + dateTimeFormat
 				+ ", decimalSeperator=" + decimalSeperator + ", fetchSize=" + fetchSize + ", rowCountMessageLength="
 				+ rowCountMessageLength + ", parallelCount=" + parallelCount + ", parallelDivisorColumns="
-				+ Arrays.toString(parallelDivisorColumns) + ", combineFiles=" + combineFiles + "]";
+				+ Arrays.toString(parallelDivisorColumns) + ", combineFiles=" + combineFiles + ", fileType=" + fileType
+				+ "]";
 	}
 	
 	

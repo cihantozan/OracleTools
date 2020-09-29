@@ -1,7 +1,6 @@
 package oracletools.unloader;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -16,6 +15,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -124,7 +125,7 @@ public class SerialUnloader implements IOracleTool {
 
 
 
-	private void unload() {		
+	private void unloadText() {		
 
 		try {
 						
@@ -274,7 +275,12 @@ public class SerialUnloader implements IOracleTool {
 		return new RowInfo(row.toString(), hasRowsAfter);
 	}
 	
-	public void unloadExcel() throws IOException, ClassNotFoundException, SQLException {
+	public void unloadExcel()  {
+		
+		XSSFWorkbook workbook=null;
+		FileOutputStream fileOutputStream=null;
+		
+		try {
 		
 		logger.start();
 		
@@ -311,9 +317,10 @@ public class SerialUnloader implements IOracleTool {
 		logger.message("Query executed");
 		
 		
-		XSSFWorkbook workbook=new XSSFWorkbook(fileName);
+		workbook=new XSSFWorkbook();
 		XSSFSheet sheet = workbook.createSheet("Sheet1");
 		
+		int totalRowNum=0;
 		
 		//columnNames
 		if(
@@ -324,19 +331,47 @@ public class SerialUnloader implements IOracleTool {
 				      || (!this.parameters.isCombineFiles())
 				 )
 		){
-			String rowColumnNames=getColumnNames(resultSetMetaData);
-			writer.write(rowColumnNames);		
+			Row row=sheet.createRow(totalRowNum);
+			totalRowNum++;
+			
+			for(int i=1; i<=resultSetMetaData.getColumnCount(); i++) {
+				Cell cell=row.createCell(i-1);
+				cell.setCellValue(resultSetMetaData.getColumnName(i));
+			}
+					
 		}		
 		
+		fileOutputStream=new FileOutputStream(fileName);
+		workbook.write(fileOutputStream);
+		workbook.close();
+		fileOutputStream.close();
 		
+		}
+		catch(Exception e) {
+			try {
+				workbook.close();
+				fileOutputStream.close();
+				con.close();
+							
+			} 
+			catch (Exception e1) {}
+						
+			logger.error();
+			errorListener.onError(this.name,e);	
+		}
 	}
 
 
 
 	@Override
 	public void run() {
+		if(this.parameters.getFileType().equals(FileType.Text)){
+			unloadText();
+		}
+		else if(this.parameters.getFileType().equals(FileType.Excel)) {
+			unloadExcel();
+		}
 		
-		unload();
 		
 	}
 	

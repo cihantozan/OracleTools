@@ -55,6 +55,7 @@ public class Unloader {
 		parameters.setParallelCount(Integer.parseInt(xmlParameters.get("parallelCount")));
 		parameters.setParallelDivisorColumns(xmlParameters.get("parallelDivisorColumns").split(","));
 		parameters.setCombineFiles(Boolean.parseBoolean(xmlParameters.get("combineFiles")));
+		parameters.setFileType(FileType.valueOf(xmlParameters.get("fileType")));
 		
 		this.threads=new Thread[this.parameters.getParallelCount()];
 		

@@ -57,10 +57,10 @@ public class Main {
 		unloader.unload();
 		*/
 		
-		/*
+		
 		Unloader unloader=new Unloader();
 		unloader.unload();
-		*/
+		
 
 		
 		
@@ -110,9 +110,10 @@ public class Main {
 		transfer.transfer();
 		*/
 		
+		/*
 		Transfer transfer=new Transfer();
 		transfer.transfer();
-		
+		*/
 		
 		/*
 		String[] files = {"C:\\Users\\Cihan\\Documents\\a_1.txt","C:\\Users\\Cihan\\Documents\\a_2.txt","C:\\Users\\Cihan\\Documents\\a_3.txt","C:\\Users\\Cihan\\Documents\\a_4.txt"};
