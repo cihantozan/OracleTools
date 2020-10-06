@@ -16,6 +16,8 @@ import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -319,6 +321,13 @@ public class SerialUnloader implements IOracleTool {
 		
 		workbook=new XSSFWorkbook();
 		XSSFSheet sheet = workbook.createSheet("Sheet1");
+		CreationHelper creationHelper=workbook.getCreationHelper();
+		CellStyle cellStyleDate=workbook.createCellStyle();
+		cellStyleDate.setDataFormat(creationHelper.createDataFormat().getFormat(this.parameters.getDateFormat()));
+		CellStyle cellStyleDateTime=workbook.createCellStyle();
+		cellStyleDateTime.setDataFormat(creationHelper.createDataFormat().getFormat(this.parameters.getDateTimeFormat()));
+		CellStyle cellStyleTimeStamp=workbook.createCellStyle();
+		cellStyleTimeStamp.setDataFormat(creationHelper.createDataFormat().getFormat(this.parameters.getDateTimeFormat()));
 		
 		int totalRowNum=0;
 		
@@ -339,7 +348,28 @@ public class SerialUnloader implements IOracleTool {
 				cell.setCellValue(resultSetMetaData.getColumnName(i));
 			}
 					
-		}		
+		}	
+		
+		
+		//unload			
+		int rowCount=0;
+		boolean hasRows=firstRow;
+		while(hasRows) {				
+			ExcelRowInfo rowInfo=getExcelRow(rs, resultSetMetaData, sheet, totalRowNum, cellStyleDate, cellStyleDateTime, cellStyleTimeStamp);							
+			totalRowNum++;
+			rowCount++;
+			
+			//rowCountMessaging
+			if(rowCount == this.parameters.getRowCountMessageLength()) {
+				logger.step(rowCount, "rows");
+				rowCount=0;
+			}
+			
+			hasRows=rowInfo.getHasRowsAfter();
+		}
+		
+		logger.step(rowCount, "rows");	
+		
 		
 		fileOutputStream=new FileOutputStream(fileName);
 		workbook.write(fileOutputStream);
@@ -359,6 +389,53 @@ public class SerialUnloader implements IOracleTool {
 			logger.error();
 			errorListener.onError(this.name,e);	
 		}
+	}
+	
+	private ExcelRowInfo getExcelRow(ResultSet rs,ResultSetMetaData resultSetMetaData, XSSFSheet sheet,int totalRowNum, CellStyle cellStyleDate, CellStyle cellStyleDateTime, CellStyle cellStyleTimeStamp) throws SQLException {
+				
+		
+		Row row=sheet.createRow(totalRowNum);				
+				
+		boolean hasRowsAfter=false;
+		
+		for(int i=1;i<=resultSetMetaData.getColumnCount();i++) {
+			Cell cell=row.createCell(i-1);
+			Object column=rs.getObject(i);
+			String columnText;
+			if(column!=null) {
+				if(resultSetMetaData.getColumnTypeName(i).equals("DATE")) {
+					Date columnDate=rs.getDate(i);	
+					
+					if (simpleTimeFormat.format(columnDate).equals("00:00:00")) {								
+						cell.setCellValue(columnDate);
+						cell.setCellStyle(cellStyleDate);
+					}
+					else {								
+						cell.setCellValue(columnDate);
+						cell.setCellStyle(cellStyleDateTime);
+					}
+					
+					
+				}
+				else if(resultSetMetaData.getColumnTypeName(i).equals("TIMESTAMP")) {
+					Timestamp columnTimeStamp = rs.getTimestamp(i);					
+					cell.setCellValue(columnTimeStamp.toLocalDateTime());
+					cell.setCellStyle(cellStyleTimeStamp);
+				}
+				else if(resultSetMetaData.getColumnTypeName(i).equals("NUMBER")){
+					double columnDecimal=rs.getDouble(i);					
+					cell.setCellValue(columnDecimal);
+				}
+				else {
+					columnText=column.toString();
+					cell.setCellValue(columnText);
+				}
+									
+			}			
+		}
+		hasRowsAfter=rs.next();		
+	
+		return new ExcelRowInfo(row, hasRowsAfter);
 	}
 
 

@@ -26,6 +26,7 @@ import oracletools.util.OracleConnection;
 //jdk nýn önceki versiyonlarýnda da dene
 //karakter seti parametrik olsun
 //farklý teknolojiler için altyapý
+//serial unloader excel refactor edilecek
 
 public class Main {
 
