@@ -24,7 +24,8 @@ public class OracleConnection {
 	
 		
 	public String getConnectionString() {
-		return "jdbc:oracle:thin:@"+this.host+":"+this.port+":"+this.databaseName;
+		return "jdbc:oracle:thin:@"+this.host+":"+this.port+"/"+this.databaseName;
+		//return "jdbc:oracle:thin:@"+this.host;
 	}
 
 	public String getUser() {

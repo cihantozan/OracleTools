@@ -19,14 +19,15 @@ import oracletools.unloader.UnloaderParameters;
 import oracletools.util.FileCombiner;
 import oracletools.util.OracleConnection;
 
-//connectionlar þifreli biçimde kaydedilecek
-//TNS varsa alýnacak
-//parametrelerin default deðerleri???
+//connectionlar ï¿½ifreli biï¿½imde kaydedilecek
+//TNS varsa alï¿½nacak
+//parametrelerin default deï¿½erleri???
 //unload,load excel
-//jdk nýn önceki versiyonlarýnda da dene
+//jdk nï¿½n ï¿½nceki versiyonlarï¿½nda da dene
 //karakter seti parametrik olsun
-//farklý teknolojiler için altyapý
+//farklï¿½ teknolojiler iï¿½in altyapï¿½
 //serial unloader excel refactor edilecek
+//oracle sid ve service name seÃ§imi eklenecek.
 
 public class Main {
 

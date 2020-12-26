@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import org.apache.commons.lang3.StringUtils;
+
 import oracletools.util.IOracleTool;
 import oracletools.util.IParameters;
 import oracletools.util.Logger;
@@ -138,7 +140,9 @@ public class SerialLoader implements IOracleTool {
 			ResultSet rs=stmt.executeQuery(metadataQuery);
 			rs.next();
 			
-			String parameters="?,".repeat(rs.getInt(1));
+			
+			String parameters=StringUtils.repeat("?,",rs.getInt(1));
+			//String parameters="?,".repeat(rs.getInt(1));
 			parameters=parameters.substring(0,parameters.length()-1);
 			
 			String append="";

@@ -1,10 +1,10 @@
 <parameters>
-<dbUser>USER1</dbUser>
-<dbPassword>Tvn279um</dbPassword>
-<dbHost>localhost</dbHost>
+<dbUser>user1</dbUser>
+<dbPassword>cihan123</dbPassword>
+<dbHost>172.17.0.2</dbHost>
 <dbPort>1521</dbPort>
-<dbName>ORCL</dbName>
-<file>C:\Users\Cihan\Documents\export.txt</file>
+<dbName>ORCLPDB1</dbName>
+<file>/home/cihan/Documents/export.txt</file>
 <columnDelimiter>;</columnDelimiter> 
 <rowDelimiter>
 </rowDelimiter>
@@ -20,9 +20,9 @@
 <query>
  <![CDATA[
 select * 
-from user1.table1
+from user1.table2
 where rownum<=3000
 ]]>
 </query>
-<fileType>Excel</fileType>
+<fileType>Text</fileType>
 </parameters>

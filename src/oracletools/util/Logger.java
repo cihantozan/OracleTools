@@ -2,7 +2,6 @@ package oracletools.util;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -84,14 +83,14 @@ public class Logger {
 	public void step(long rowCount, String message) {
 		if (loggerActivityListener != null) {
 			stepTime = LocalDateTime.now();
-			String stepDiffStr = getDiffTimeString(prevStepTime, stepTime);
-			String totalDiffStr = getDiffTimeString(startTime, stepTime);
+			String stepDiffStr = Util.getDiffTimeString(prevStepTime, stepTime);
+			String totalDiffStr = Util.getDiffTimeString(startTime, stepTime);
 
 			totalRowCount += rowCount;
-			String rps = Util.rpad(decimalFormatWithoutPrecision.format(getRps(prevStepTime, stepTime, rowCount)), 7,
+			String rps = Util.rpad(decimalFormatWithoutPrecision.format(Util.getRps(prevStepTime, stepTime, rowCount)), 7,
 					" ");
 			String totalRps = Util
-					.rpad(decimalFormatWithoutPrecision.format(getRps(startTime, stepTime, totalRowCount)), 7, " ");
+					.rpad(decimalFormatWithoutPrecision.format(Util.getRps(startTime, stepTime, totalRowCount)), 7, " ");
 
 			String totalRowCountString = Util.rpad(decimalFormatWithoutPrecision.format(totalRowCount), 14, " ");
 
@@ -123,12 +122,5 @@ public class Logger {
 	}
 	
 	
-	private String getDiffTimeString(LocalDateTime startTime,LocalDateTime endTime) {
-		Duration diff=Duration.between(startTime, endTime);	
-		return Util.lpad(diff.toHoursPart(),2,"0") +":"+Util.lpad(diff.toMinutesPart(),2,"0")+":"+Util.lpad(diff.toSecondsPart(),2,"0");
-	}
-	private double getRps(LocalDateTime startTime,LocalDateTime endTime, long rowCount) {
-		Duration diff=Duration.between(startTime, endTime);
-		return (double)rowCount/diff.toSeconds();		
-	}
+	
 }

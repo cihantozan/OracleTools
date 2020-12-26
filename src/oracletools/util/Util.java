@@ -38,13 +38,20 @@ public class Util {
 			return sb.toString();
 		}
 	}
+	
 	public static String getDiffTimeString(LocalDateTime startTime,LocalDateTime endTime) {
-		Duration diff=Duration.between(startTime, endTime);	
-		return Util.lpad(diff.toHoursPart(),2,"0") +":"+Util.lpad(diff.toMinutesPart(),2,"0")+":"+Util.lpad(diff.toSecondsPart(),2,"0");
-	}
-	public static double getRps(LocalDateTime startTime,LocalDateTime endTime, int rowCount) {
 		Duration diff=Duration.between(startTime, endTime);
-		return (double)rowCount/diff.toSeconds();		
+		long totalMilliseconds=diff.toMillis();		
+		int totalHours = (int) Math.floor((double)totalMilliseconds / 1000 / 60 / 60);
+		int remiainingMinutes = (int) Math.floor( (double)(totalMilliseconds - totalHours*60*60*1000) / 1000 / 60 );
+		int remainingSeconds = (int) Math.floor( (double)(totalMilliseconds - totalHours*60*60*1000 - remiainingMinutes*60*1000) / 1000 / 60 ); 
+		
+		return Util.lpad(totalHours,2,"0") +":"+Util.lpad(remiainingMinutes,2,"0")+":"+Util.lpad(remainingSeconds,2,"0");
+		//return Util.lpad(diff.toHoursPart(),2,"0") +":"+Util.lpad(diff.toMinutesPart(),2,"0")+":"+Util.lpad(diff.toSecondsPart(),2,"0");
+	}
+	public static double getRps(LocalDateTime startTime,LocalDateTime endTime, long rowCount) {
+		Duration diff=Duration.between(startTime, endTime);
+		return (double)rowCount/diff.toMillis()/1000;		
 	}
 
 }

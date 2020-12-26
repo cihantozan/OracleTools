@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
+import org.apache.commons.lang3.StringUtils;
+
 import oracletools.util.IOracleTool;
 import oracletools.util.IParameters;
 import oracletools.util.Logger;
@@ -138,7 +140,8 @@ public class SerialTransfer implements IOracleTool {
 			targetCon = DriverManager.getConnection(this.parameters.getTargetConnection().getConnectionString(),
 					this.parameters.getTargetConnection().getUser(),
 					this.parameters.getTargetConnection().getPassword());
-			String queryParameters = "?,".repeat(resultSetMetaData.getColumnCount());
+			String queryParameters = StringUtils.repeat("?,", resultSetMetaData.getColumnCount());
+			//String queryParameters = "?,".repeat(resultSetMetaData.getColumnCount());
 			queryParameters = queryParameters.substring(0, queryParameters.length() - 1);
 			String append = "";
 			if (this.parameters.isDirectPathInsert())
