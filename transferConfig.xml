@@ -1,14 +1,17 @@
 <parameters>
+
 <sourceDbUser>USER1</sourceDbUser>
-<sourceDbPassword>Tvn279um</sourceDbPassword>
-<sourceDbHost>localhost</sourceDbHost>
+<sourceDbPassword>cihan123</sourceDbPassword>
+<sourceDbHost>172.17.0.2</sourceDbHost>
 <sourceDbPort>1521</sourceDbPort>
-<sourceDbName>ORCL</sourceDbName>
+<sourceDbName>ORCLPDB1</sourceDbName>
+
 <targetDbUser>USER1</targetDbUser>
-<targetDbPassword>Tvn279um</targetDbPassword>
-<targetDbHost>localhost</targetDbHost>
+<targetDbPassword>cihan123</targetDbPassword>
+<targetDbHost>172.17.0.2</targetDbHost>
 <targetDbPort>1521</targetDbPort>
-<targetDbName>ORCL</targetDbName>
+<targetDbName>ORCLPDB1</targetDbName>
+
 <sourceQuery>
  <![CDATA[
 select * 
@@ -17,8 +20,8 @@ from user1.table1
 </sourceQuery>
 <targetTable>user1.table2</targetTable>
 <batchSize>1000000</batchSize>
-<truncateTargetTable>true</truncateTargetTable>
-<directPathInsert>false</directPathInsert>
+<truncateTargetTable>false</truncateTargetTable>
+<directPathInsert>true</directPathInsert>
 <commitAfterLoad>true</commitAfterLoad>
 <parallelCount>4</parallelCount>
 <parallelDivisorColumns>A</parallelDivisorColumns>
