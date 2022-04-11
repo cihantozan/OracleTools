@@ -1,0 +1,279 @@
+
+
+Sub Makro3()
+'
+' Makro3 Makro
+'
+    Sheets(1).Select
+    Range("A1").Select
+    Dim keys1 As Range
+    Set keys1 = Application.InputBox("Range:", Type:=8, Default:="A1")
+
+    Sheets(2).Select
+    Range("A1").Select
+    Dim keys2 As Range
+    Set keys2 = Application.InputBox("Range:", Type:=8, Default:="A1")
+
+    
+    fullCompare = InputBox("All Columns Compare", "All Columns Compare", 1)
+    
+    'Dim table1Keys, table2Keys, fullCompare
+    'table1Keys = "1,2"
+    'table2Keys = "1,2"
+    
+    
+    'Dim columnCount1, columnCount2, rowCount1, rowCount2
+    'Dim table1KeysArray, table2KeysArray
+    'table1KeysArray = Split(table1Keys, ",")
+    'table2KeysArray = Split(table2Keys, ",")
+    
+    
+    
+    Dim Sheet As Worksheet
+    For Each Sheet In Worksheets
+        If Sheet.Name = "JoinSheet" Then
+            Application.DisplayAlerts = False
+            Sheet.Delete
+            Application.DisplayAlerts = True
+        End If
+    Next Sheet
+    
+    Sheets.Add(After:=Sheets(Sheets.Count)).Name = "JoinSheet"
+    
+    ' sheet1 copy
+    Sheets(1).Select
+    Range("A1").Select
+    Selection.CurrentRegion.Select
+    columnCount1 = Selection.Columns.Count
+    rowCount1 = Selection.Rows.Count
+    Selection.Copy
+    Sheets("JoinSheet").Select
+    Range("A1").Select
+    ActiveSheet.Paste
+    
+    ' sheet2 copy
+    Sheets(2).Select
+    Range("A1").Select
+    Selection.CurrentRegion.Select
+    columnCount2 = Selection.Columns.Count
+    rowCount2 = Selection.Rows.Count
+    Selection.Copy
+    Sheets("JoinSheet").Select
+    Range("A1").Columns(columnCount1 + 1).Select
+    ActiveSheet.Paste
+    
+    ' color1
+    Range(Cells(1, 1), Cells(rowCount1, columnCount1)).Select
+    Selection.Interior.Color = RGB(204, 229, 255)
+    
+    ' sort1
+    ActiveWorkbook.Worksheets("JoinSheet").Sort.SortFields.Clear
+    
+    'Dim item As Variant
+    'For Each item In table1KeysArray
+    '    ActiveWorkbook.Worksheets("JoinSheet").Sort.SortFields.Add2 Key:=Range("A1").Columns(CInt(item)), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    'Next item
+    Dim item As Variant
+    For Each item In keys1
+        ActiveWorkbook.Worksheets("JoinSheet").Sort.SortFields.Add2 Key:=Range("A1").Columns(item.Column), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    Next
+    
+    
+    With ActiveWorkbook.Worksheets("JoinSheet").Sort
+        .SetRange Selection
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    
+    'color2
+    Range(Cells(1, columnCount1 + 1), Cells(rowCount2, columnCount1 + columnCount2)).Select
+    Selection.Interior.Color = RGB(215, 193, 193)
+    
+    'sort2
+    ActiveWorkbook.Worksheets("JoinSheet").Sort.SortFields.Clear
+    'Dim item2 As Variant
+    'For Each item2 In table2KeysArray
+    '    ActiveWorkbook.Worksheets("JoinSheet").Sort.SortFields.Add2 Key:=Range("A1").Columns(columnCount1 + CInt(item2)), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    'Next item2
+    Dim item2 As Variant
+    For Each item2 In keys2
+        ActiveWorkbook.Worksheets("JoinSheet").Sort.SortFields.Add2 Key:=Range("A1").Columns(columnCount1 + item2.Column), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    Next
+
+    With ActiveWorkbook.Worksheets("JoinSheet").Sort
+        .SetRange Selection
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    
+    
+    
+    
+    Dim currentRow
+    currentRow = 2
+    
+    Cells(1, columnCount1 + columnCount2 + 1).Value = "Key Comparison"
+    If fullCompare = 1 Then
+        For i = 1 To columnCount1
+            Cells(1, columnCount1 + columnCount2 + 1 + i).Value = "c_" + Cells(1, i).Value
+        Next
+    End If
+    
+    Do While True
+        
+        If IsEmpty(Cells(currentRow, 1)) And IsEmpty(Cells(currentRow, columnCount1 + 1)) Then
+            Exit Do
+        End If
+        
+        If currentRow >= 100 Then
+            MsgBox "100ü aştı"
+            Exit Do
+        End If
+        
+        Dim compare
+        Dim item3 As Variant
+        compare = 0
+        For Each item3 In keys1
+            If IsEmpty(Cells(currentRow, item3.Column).Value) And Not IsEmpty(Cells(currentRow, columnCount1 + item3.Column).Value) Then
+                compare = 10
+            ElseIf Not IsEmpty(Cells(currentRow, item3.Column).Value) And IsEmpty(Cells(currentRow, columnCount1 + item3.Column).Value) Then
+                compare = 20
+            ElseIf Cells(currentRow, item3.Column).Value > Cells(currentRow, columnCount1 + item3.Column).Value Then
+                compare = 1
+                Exit For
+            ElseIf Cells(currentRow, item3.Column).Value < Cells(currentRow, columnCount1 + item3.Column).Value Then
+                compare = 2
+                Exit For
+            End If
+        Next item3
+        
+        If compare = 1 Then
+            Range(Cells(currentRow, 1), Cells(currentRow, columnCount1)).Select
+            Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
+            Cells(currentRow, columnCount1 + columnCount2 + 1).Value = "Only2"
+            Cells(currentRow, columnCount1 + columnCount2 + 1).Interior.Color = RGB(215, 193, 193)
+        ElseIf compare = 2 Then
+            Range(Cells(currentRow, columnCount1 + 1), Cells(currentRow, columnCount1 + columnCount2)).Select
+            Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
+            Cells(currentRow, columnCount1 + columnCount2 + 1).Value = "Only1"
+            Cells(currentRow, columnCount1 + columnCount2 + 1).Interior.Color = RGB(204, 229, 255)
+        ElseIf compare = 10 Then
+            Cells(currentRow, columnCount1 + columnCount2 + 1).Value = "Only2"
+            Cells(currentRow, columnCount1 + columnCount2 + 1).Interior.Color = RGB(215, 193, 193)
+        ElseIf compare = 20 Then
+            Cells(currentRow, columnCount1 + columnCount2 + 1).Value = "Only1"
+            Cells(currentRow, columnCount1 + columnCount2 + 1).Interior.Color = RGB(204, 229, 255)
+        Else
+            Cells(currentRow, columnCount1 + columnCount2 + 1).Value = "OK"
+        End If
+        
+        If fullCompare = 1 Then
+            For i = 1 To columnCount1
+                'If Cells(currentRow, i).Value = Cells(currentRow, i + columnCount1).Value Then
+                '    Cells(currentRow, columnCount1 + columnCount2 + 1 + i) = True
+                'Else
+                '    Cells(currentRow, columnCount1 + columnCount2 + 1 + i) = False
+                '    Cells(currentRow, i).Interior.Color = RGB(255, 255, 0)
+                '    Cells(currentRow, i + columnCount1).Interior.Color = RGB(255, 255, 0)
+                '    Cells(currentRow, columnCount1 + columnCount2 + 1 + i).Interior.Color = RGB(255, 204, 204)
+                'End If
+                
+                Cells(currentRow, columnCount1 + columnCount2 + 1 + i).Formula = "=EXACT(" + Cells(currentRow, i).Address + "," + Cells(currentRow, i + columnCount1).Address + ")"
+                'Cells(currentRow, columnCount1 + columnCount2 + 1 + i).Formula = "=1+2"
+                
+            Next
+            
+            
+        End If
+        
+        
+        
+        
+        
+        currentRow = currentRow + 1
+        
+    Loop
+    
+    
+    Cells(1, columnCount1 + columnCount2 + 2).Select
+    
+    Range(Selection, Selection.End(xlToRight)).Select
+    Range(Selection, Selection.End(xlDown)).Select
+    
+    
+
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+        Formula1:="=FALSE"
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    With Selection.FormatConditions(1).Font
+        .Color = -16383844
+        .TintAndShade = 0
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 13551615
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+
+
+    
+    
+
+    Range("A1").Select
+    Selection.AutoFilter
+
+    Columns(columnCount1 + columnCount2 + 1).EntireColumn.AutoFit
+
+    'Borders
+    Range("A1").Select
+    Selection.CurrentRegion.Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideVertical)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideHorizontal)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    Range("A1").Select
+
+    
+End Sub
+
