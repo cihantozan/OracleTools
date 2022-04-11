@@ -1,3 +1,8 @@
+Sub Deneme1()
+    JoinForm.Show
+
+End Sub
+
 Sub Join(keys1 As Range, keys2 As Range, targetLocation As Range, newSheet As Boolean, fullCompare As Boolean)
         
     Dim target As Range
@@ -161,7 +166,7 @@ Sub Join(keys1 As Range, keys2 As Range, targetLocation As Range, newSheet As Bo
             Next
         End If
        
-        'Debug.Print currentRow
+        JoinForm.Label5.Caption = currentRow
         currentRow = currentRow + 1
         
     Loop
@@ -249,3 +254,6 @@ Sub Join(keys1 As Range, keys2 As Range, targetLocation As Range, newSheet As Bo
     
     
 End Sub
+ 
+
+
