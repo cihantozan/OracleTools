@@ -1,0 +1,22 @@
+Dim keys1 As Range
+Dim keys2 As Range
+Dim targetLocation As Range
+
+Private Sub CommandButton1_Click()
+    Module1.Join keys1, keys2, targetLocation, OptionButton2.Value, CheckBox1.Value
+End Sub
+
+Private Sub CommandButton2_Click()
+    Set keys1 = Application.InputBox("Select Table1 Key Columns", "Select Table1 Key Columns", Type:=8, Default:="A1")
+    CommandButton2.Caption = keys1.Address
+End Sub
+
+Private Sub CommandButton3_Click()
+    Set keys2 = Application.InputBox("Select Table2 Key Columns", "Select Table1 Key Columns", Type:=8, Default:="A1")
+    CommandButton3.Caption = keys2.Address
+End Sub
+
+Private Sub CommandButton4_Click()
+    Set targetLocation = Application.InputBox("Select Cell", "Select Cell", Type:=8, Default:="A1")
+    CommandButton4.Caption = targetLocation.Address
+End Sub
