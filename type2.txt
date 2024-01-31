@@ -1,0 +1,96 @@
+WITH tmp1
+         AS (SELECT DATA_DATE,
+                    MIS_CONTRACT_ID KEY1,
+                    MEASURE_ID      KEY2,
+                    CREDIT_CLASS    COL1
+               FROM ETL_MIS.PRF_RETLOAN_CREDIT_CLASS_TMP1),
+         hst
+         AS (SELECT MIS_CONTRACT_ID KEY1,
+                    MEASURE_ID      KEY2,
+                    CREDIT_CLASS    COL1,
+                    START_DATE,
+                    END_DATE
+               FROM DM_MIS.PRF_RETLOAN_CREDIT_CLASS_HST),
+         min_date AS (SELECT MIN (data_date) min_dt FROM tmp1),
+     min_date_wd as ( select max(b.date_value) min_dt_wd from min_date a , dm_mis.prf_calendar b where a.min_dt>b.date_value and (b.DATE_TYPE='N' or b.date_value=b.last_day_of_month or b.date_value=b.first_day_of_month) ),
+         t1
+         AS (SELECT key1,
+                    key2,
+                    col1,
+                    date_value start_date,
+                    NVL (
+                        LEAD (prev_date)
+                        OVER (PARTITION BY key1, key2 ORDER BY date_value),
+                        TO_DATE ('01.01.9999', 'dd.mm.yyyy'))
+                        end_date,
+                   CASE WHEN PREV_COL1 ='-1'  THEN 1 ELSE 0 END  first_flag,prev_wd
+               FROM (SELECT NVL (a.key1, c.key1)            key1,
+                            NVL (a.key2, c.key2)            key2,
+                            NVL (c.col1, a.col1)            col1,
+                            NVL (
+                                LAG (
+                                    NVL (c.col1, a.col1))
+                                OVER (
+                                    PARTITION BY NVL (a.key1, c.key1),
+                                                 NVL (a.key2, c.key2)
+                                    ORDER BY NVL (b.date_value, c.data_date)),
+                                -1)
+                                prev_col1,
+                            NVL (
+                                LAG (
+                                    NVL (b.date_value, c.data_date))
+                                OVER (
+                                    PARTITION BY NVL (a.key1, c.key1),
+                                                 NVL (a.key2, c.key2)
+                                    ORDER BY NVL (b.date_value, c.data_date)),
+                                TO_DATE ('01.01.0001', 'dd.mm.yyyy'))
+                                prev_date,
+                            NVL (b.date_value, c.data_date) date_value,prev_wd
+                       FROM hst  a
+                          JOIN min_date aa ON (   a.end_date >= aa.min_dt)
+        JOIN
+        (
+            select date_value,
+                   lag(date_value) over (partition by 1 order by date_value) prev_wd
+            from dm_mis.prf_calendar x
+            where x.date_value>=  (SELECT min_dt_wd FROM min_date_wd)
+              and x.date_value <= (SELECT MAX (data_date) FROM etl_mis.prf_source_entity_date_hst WHERE source_entity_id = 10)
+              and ( x.date_type = 'N' OR x.date_value = last_day_of_month OR x.date_value = first_day_of_month)
+        ) b ON b.date_value >= a.start_date AND b.date_value <= a.end_date
+        FULL OUTER JOIN tmp1 c ON c.key1 = a.key1 AND c.key2 = a.key2 AND c.data_date = b.date_value
+    )
+    WHERE col1 <> prev_col1 OR (date_value - prev_date > 1 and prev_date<>prev_wd )
+)
+    SELECT NVL (b.key1, a.key1)         MIS_CONTRACT_ID,
+           NVL (b.key2, a.key2)         MEASURE_ID,
+           NVL (b.col1, a.col1)         CREDIT_CLASS,
+           CASE
+               WHEN b.first_flag = 1 AND a.col1 = b.col1 THEN a.start_date
+               ELSE NVL (b.start_date, a.start_date)
+           END
+               start_date,
+           NVL (b.end_date, a.end_date) end_date,
+           CASE
+               WHEN b.key1 IS NULL
+               THEN
+                   'DELETE'
+               WHEN a.key1 IS NULL
+               THEN
+                   'INSERT'
+               WHEN a.col1 <> b.col1 OR a.end_date <> b.end_date
+               THEN
+                   'UPDATE'
+               ELSE
+                   'NOCHANGE'
+           END
+               operation
+      FROM hst  a
+           JOIN min_date aa
+               ON (a.start_date >= aa.min_dt OR a.end_date >= aa.min_dt)
+           FULL OUTER JOIN t1 b
+               ON     a.key1 = b.key1
+                  AND a.key2 = b.key2
+                  AND (   a.start_date = b.start_date
+                       OR (    b.first_flag = 1
+                           AND a.col1 = b.col1
+                           AND a.start_date < b.start_date))
